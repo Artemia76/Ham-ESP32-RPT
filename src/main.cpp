@@ -33,18 +33,14 @@
 AudioInfo info(22050, 1, 16);
 I2SStream in;
 I2SStream out;
-//OutputMixer<int16_t> mixer (out,1);
 VolumeMeter VolMeter(out);
 AudioRealFFT fft(VolMeter);
 CircularBuffer <AudioFFTResult,10> FFTBuf;
 AsyncTimer t;
 WAVDecoder decoder;
 AudioSourceSPIFFS source("/",".wav");
-//BufferedStream BufPlayer(DEFAULT_BUFFER_SIZE);
 AudioPlayer player(source,out,decoder);
 StreamCopy copier(fft, in);
-//StreamCopy CpyMixer1(mixer, VolMeter);
-//StreamCopy CpyMixer2(mixer, BufPlayer);
 
 Task task("fft-copy", 10000, 1, 0);
 
@@ -61,7 +57,7 @@ Mode LastEtat=IDLE;
 
 bool CD = false;
 float mag_ref = 10000000.0;
-float SeuilSquelch = -30.0; //Seuil de déclenchement du squelch en dB
+float SeuilSquelch = -30.0; //Squelch threshold
 uint8_t Counter = 0;
 
 // Functions Proto
@@ -197,6 +193,8 @@ void setup(void)
 
 }
 
+/// @brief Detect a 1750 Hz tone 
+/// @return true is 1750 Hz is detected
 bool Is1750Detected ()
 {
   float tolerance = 100; // Tolérance de détection
@@ -217,6 +215,7 @@ bool Is1750Detected ()
   return false;
 }
 
+/// @brief Sequence is reviewed each second
 void OnTimer ()
 {
   if (VolMeter.volumeDB() > SeuilSquelch)
@@ -295,7 +294,7 @@ void OnTimer ()
 }
 
 //
-// Display fft result on Serial Monitor
+// Fill a circular buffer to analyse freq
 //
 void fftResult(AudioFFTBase &fft)
 {
@@ -303,24 +302,15 @@ void fftResult(AudioFFTBase &fft)
     float CarriageAvg=0.0;
     AudioFFTResult Score[5];
     fft.resultArray(Score);
-    //Serial.println("-----------------------");
     for (AudioFFTResult Line : Score)
     {
-      //Serial.print(Line.frequency);
-      //Serial.print(" ");
-      //Serial.println(String(Line.magnitude) + " Mag");
       CarriageAvg += Line.magnitude / 5;
       FFTBuf.push(Line);
     }
-
-    //Serial.println("Cariage average = " + String(CarriageAvg));
-    //Serial.println("-----------------------");
 }
 
-
-
 //
-// Copy input signal to fft
+// Main Loop
 //
 void loop()
 {
