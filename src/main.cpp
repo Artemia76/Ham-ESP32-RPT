@@ -71,49 +71,6 @@ bool Is1750Detected ();
 int lastState = HIGH;
 int currentState;
 
-void setAudioChain(bool Flag)
-{
-  // Audio in active
-  if (!Flag)
-  {
-    //
-    // Configure in stream
-    //
-    auto configin = in.defaultConfig(RX_MODE);
-    configin.copyFrom(info);
-    configin.i2s_format = I2S_STD_FORMAT;
-    configin.is_master = true;
-    configin.port_no = 0;
-    configin.pin_ws = AD_LRCK;                        // LRCK
-    configin.pin_bck = AD_SCLK;                       // SCLK
-    configin.pin_data = AD_SDIN;                      // SDOUT
-    configin.pin_mck = AD_MCLK;
-    in.begin(configin);
-
-    //
-    // Configure FFT
-    //
-    auto tcfg = fft.defaultConfig();
-    tcfg.length = 512;
-    tcfg.copyFrom(info);
-    //tcfg.window_function = new BlackmanHarris;
-    tcfg.callback = &fftResult;
-    fft.begin(tcfg);
-
-    //
-    // Configure Volume Meter
-    //
-    VolMeter.begin(info);
-  }
-  else
-  {
-    in.end();
-    fft.end();
-    VolMeter.end();
-
-  }
-}
-
 /// @brief 
 /// @param  
 void setup(void)
@@ -150,7 +107,21 @@ void setup(void)
   configout.pin_mck = DA_MCLK;
   out.begin(configout);
 
-  setAudioChain(true);
+  //
+  // Configure FFT
+  //
+  auto tcfg = fft.defaultConfig();
+  tcfg.length = 512;
+  tcfg.copyFrom(info);
+  //tcfg.window_function = new BlackmanHarris;
+  tcfg.callback = &fftResult;
+  fft.begin(tcfg);
+
+  //
+  // Configure Volume Meter
+  //
+  VolMeter.begin(info);
+
   //
   // Configure Player
   //
@@ -181,19 +152,25 @@ void setup(void)
         case REPEATER:
         {
           player.end();
-          setAudioChain(true);
+          in.begin();
+          fft.begin();
+          VolMeter.begin();
           break;
         }
         case ANNONCE_DEB:
         {
-          setAudioChain(false);
+          in.end();
+          fft.end();
+          VolMeter.end();
           player.begin(1);
           player.setAutoNext(false);
           break;
         }
         case ANNONCE_FIN:
         {
-          setAudioChain(false);
+          in.end();
+          fft.end();
+          VolMeter.end();
           player.begin(0);
           player.setAutoNext(false);
           break;
