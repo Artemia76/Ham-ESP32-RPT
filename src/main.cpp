@@ -1,8 +1,9 @@
+#include <Arduino.h>
+#include "AudioConfigLocal.h"
 #include <AudioTools.h>
 #include <AudioTools/AudioLibs/AudioRealFFT.h>
 #include <AudioTools/AudioLibs/AudioSourceSPIFFS.h>
 #include <AudioTools/Concurrency/RTOS.h>
-#include <AudioTools/AudioCodecs/CodecMP3Helix.h>
 #include <CircularBuffer.hpp>
 #include <AsyncTimer.h>
 #include <atomic>
@@ -29,18 +30,21 @@
 
 
 // Définition des variables globales
-AudioInfo info(44100, 2, 16);
+AudioInfo info(22050, 1, 16);
 I2SStream in;
 I2SStream out;
-BufferedStream dummy(DEFAULT_BUFFER_SIZE, out);
-VolumeMeter VolMeter(dummy);
+//OutputMixer<int16_t> mixer (out,1);
+VolumeMeter VolMeter(out);
 AudioRealFFT fft(VolMeter);
 CircularBuffer <AudioFFTResult,10> FFTBuf;
 AsyncTimer t;
-MP3DecoderHelix decoder;
-AudioSourceSPIFFS source("/",".mp3");
+WAVDecoder decoder;
+AudioSourceSPIFFS source("/",".wav");
+//BufferedStream BufPlayer(DEFAULT_BUFFER_SIZE);
 AudioPlayer player(source,out,decoder);
-StreamCopy copier(fft, in,DEFAULT_BUFFER_SIZE);
+StreamCopy copier(fft, in);
+//StreamCopy CpyMixer1(mixer, VolMeter);
+//StreamCopy CpyMixer2(mixer, BufPlayer);
 
 Task task("fft-copy", 10000, 1, 0);
 
@@ -53,10 +57,11 @@ enum Mode
 };
 
 std::atomic<Mode> Etat(IDLE);
+Mode LastEtat=IDLE;
 
 bool CD = false;
 float mag_ref = 10000000.0;
-float SeuilSquelch = -50.0; //Seuil de déclenchement du squelch en dB
+float SeuilSquelch = -30.0; //Seuil de déclenchement du squelch en dB
 uint8_t Counter = 0;
 
 // Functions Proto
@@ -66,6 +71,49 @@ bool Is1750Detected ();
 int lastState = HIGH;
 int currentState;
 
+void setAudioChain(bool Flag)
+{
+  // Audio in active
+  if (!Flag)
+  {
+    //
+    // Configure in stream
+    //
+    auto configin = in.defaultConfig(RX_MODE);
+    configin.copyFrom(info);
+    configin.i2s_format = I2S_STD_FORMAT;
+    configin.is_master = true;
+    configin.port_no = 0;
+    configin.pin_ws = AD_LRCK;                        // LRCK
+    configin.pin_bck = AD_SCLK;                       // SCLK
+    configin.pin_data = AD_SDIN;                      // SDOUT
+    configin.pin_mck = AD_MCLK;
+    in.begin(configin);
+
+    //
+    // Configure FFT
+    //
+    auto tcfg = fft.defaultConfig();
+    tcfg.length = 512;
+    tcfg.copyFrom(info);
+    //tcfg.window_function = new BlackmanHarris;
+    tcfg.callback = &fftResult;
+    fft.begin(tcfg);
+
+    //
+    // Configure Volume Meter
+    //
+    VolMeter.begin(info);
+  }
+  else
+  {
+    in.end();
+    fft.end();
+    VolMeter.end();
+
+  }
+}
+
 /// @brief 
 /// @param  
 void setup(void)
@@ -73,9 +121,9 @@ void setup(void)
   Serial.begin(115200);
   AudioToolsLogger.begin(Serial, AudioToolsLogLevel::Warning);
  
-//
-// Configure in stream
-//
+  //
+  // Configure in stream
+  //
   auto configin = in.defaultConfig(RX_MODE);
   configin.copyFrom(info);
   configin.i2s_format = I2S_STD_FORMAT;
@@ -86,7 +134,7 @@ void setup(void)
   configin.pin_data = AD_SDIN;                      // SDOUT
   configin.pin_mck = AD_MCLK;
   in.begin(configin);
-
+  
   //
   // Configure out stream
   //
@@ -102,21 +150,13 @@ void setup(void)
   configout.pin_mck = DA_MCLK;
   out.begin(configout);
 
+  setAudioChain(true);
   //
-  // Configure FFT
+  // Configure Player
   //
-  auto tcfg = fft.defaultConfig();
-  tcfg.length = 512;
-  tcfg.copyFrom(info);
-  //tcfg.window_function = new BlackmanHarris;
-  tcfg.callback = &fftResult;
-  fft.begin(tcfg);
+  player.setBufferSize(DEFAULT_BUFFER_SIZE);
+  player.setAudioInfo(info);
 
-  VolMeter.begin(info);
-  dummy.begin();
-  //player.setAudioInfo(info);
-  //player.setSilenceOnInactive(true);
- 
   //
   // Configure I/O
   //
@@ -133,15 +173,49 @@ void setup(void)
   // Configure Task
   task.begin([]()
   {
-      if (player.isActive())
+    if (LastEtat != Etat)
+    {
+      switch (Etat)
       {
-        dummy.clear();
-        player.copy();
+        case IDLE:
+        case REPEATER:
+        {
+          player.end();
+          setAudioChain(true);
+          break;
+        }
+        case ANNONCE_DEB:
+        {
+          setAudioChain(false);
+          player.begin(1);
+          player.setAutoNext(false);
+          break;
+        }
+        case ANNONCE_FIN:
+        {
+          setAudioChain(false);
+          player.begin(0);
+          player.setAutoNext(false);
+          break;
+        }
       }
-      else
+      LastEtat = Etat;
+    }
+    switch (Etat)
+    {
+      case IDLE:
+      case REPEATER:
       {
         copier.copy();
+        break;
       }
+      case ANNONCE_DEB:
+      case ANNONCE_FIN:
+      {
+        player.copy();
+        break;
+      }
+    }
   });
 
 }
@@ -154,7 +228,7 @@ bool Is1750Detected ()
   using index_t = decltype(FFTBuf)::index_t;
 	for (index_t i = 0; i < FFTBuf.size(); i++)
   {
-      Serial.println( "Freq = " + String(FFTBuf[i].frequency) + " Magnitude = "+ String(FFTBuf[i].magnitude));
+      //Serial.println( "Freq = " + String(FFTBuf[i].frequency) + " Magnitude = "+ String(FFTBuf[i].magnitude));
 			if (
         (FFTBuf[i].frequency < (1750.0 + tolerance)) &&
         (FFTBuf[i].frequency > (1750.0-tolerance)) &&
@@ -196,10 +270,6 @@ void OnTimer ()
       if (Counter >= 1)
       {
         Etat = ANNONCE_DEB;
-        VolMeter.setOutput(dummy);
-        player.setOutput(out);
-        player.begin(0);
-        player.setAutoNext(false);
         Counter=0;
       }
       break;
@@ -210,13 +280,10 @@ void OnTimer ()
       digitalWrite(RX_LED, LOW);
       digitalWrite(TX_LED,HIGH);
       Counter++;
-      if (Counter > 5)
+      if (Counter > 3)
       {
-        player.stop();
-        player.end();
-        player.setOutput(dummy);
-        VolMeter.setOutput(out);
         Etat = REPEATER;
+        Counter=0;
       }
       break;
     }
@@ -230,10 +297,7 @@ void OnTimer ()
       if (Counter > 10)
       {
         Etat = ANNONCE_FIN;
-        VolMeter.setOutput(dummy);
-        player.setOutput(out);
-        player.begin(1);
-        //player.setAutoNext(false);
+        Counter=0;
       }
       break;
     }
@@ -242,12 +306,11 @@ void OnTimer ()
       LOGW("Annonce Fin");
       digitalWrite(RX_LED, LOW);
       digitalWrite(TX_LED,HIGH);
-      if (!player.isActive())
+      Counter++;
+      if (Counter > 3)
       {
-        player.end();
-        player.setOutput(dummy);
-        VolMeter.setOutput(out);
         Etat = IDLE;
+        Counter=0;
       }
       break;
     }
@@ -287,8 +350,7 @@ void loop()
   currentState = digitalRead(ANNONCE_BTN);
   if (lastState == LOW && currentState == HIGH)
   {
-    player.begin();
-    player.setAutoNext(false);
+    Etat = ANNONCE_DEB;
     LOGW("Playing Annonce...");
   }
   lastState = currentState;
