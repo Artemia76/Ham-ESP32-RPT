@@ -174,7 +174,7 @@
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C6"
-			(at 0 -1.68 360)
+			(at 0 -1.68 0)
 			(layer "F.SilkS")
 			(uuid "69b85448-f7b6-49bc-a356-c4866a2adf9e")
 			(effects
@@ -185,7 +185,7 @@
 			)
 		)
 		(property "Value" "10µF"
-			(at 0 1.68 360)
+			(at 0 1.68 0)
 			(layer "F.Fab")
 			(uuid "c2df311a-67a8-4f88-8d70-97132a9d4e01")
 			(effects
@@ -340,7 +340,7 @@
 			(uuid "dd5ed6d1-071a-4041-9378-3c2fbbf626c5")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "45a62714-8397-40fe-9174-82de522e473f")
 			(effects
@@ -596,7 +596,7 @@
 	(footprint "Capacitor_SMD:C_0805_2012Metric"
 		(layer "F.Cu")
 		(uuid "1b0ba208-2353-43ae-9275-f3d5ca1fb076")
-		(at 134 86)
+		(at 168.95 65.95)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C4"
@@ -809,7 +809,7 @@
 	(footprint "Capacitor_SMD:C_0805_2012Metric"
 		(layer "F.Cu")
 		(uuid "2070761a-df86-4924-987d-6fbdd8324e95")
-		(at 91 72.45 90)
+		(at 125.95 52.4 90)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C3"
@@ -1022,11 +1022,11 @@
 	(footprint "Button_Switch_SMD:SW_MEC_5GSH9"
 		(layer "F.Cu")
 		(uuid "3349a08f-4be7-4337-8480-cf6fadf00e97")
-		(at 95 102 180)
+		(at 129.95 81.95 180)
 		(descr "MEC 5G single pole normally-open tactile switch")
 		(tags "switch normally-open pushbutton push-button")
 		(property "Reference" "RESET1"
-			(at -3.325 -8.575 360)
+			(at -3.325 -8.575 0)
 			(layer "F.SilkS")
 			(uuid "a2ef9fb1-348f-4c88-a956-71090764ad89")
 			(effects
@@ -1037,7 +1037,7 @@
 			)
 		)
 		(property "Value" "SW_MEC_5E"
-			(at 0.475 8.825 360)
+			(at 0.475 8.825 0)
 			(layer "F.Fab")
 			(uuid "8f5a3e10-4928-470c-8fec-b25dbd45f739")
 			(effects
@@ -1263,7 +1263,7 @@
 			(uuid "63f80ff1-9c61-43b2-b2ec-7611eb26a07b")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "13ad9cf1-f97e-4965-a9c0-9a331730c5dd")
 			(effects
@@ -1324,7 +1324,7 @@
 	(footprint "Capacitor_SMD:C_0805_2012Metric"
 		(layer "F.Cu")
 		(uuid "58b685f7-02e9-4159-8f3c-9221f1ae1e27")
-		(at 104 69.5 90)
+		(at 138.95 49.45 90)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C1"
@@ -2013,11 +2013,11 @@
 	(footprint "Button_Switch_SMD:SW_MEC_5GSH9"
 		(layer "F.Cu")
 		(uuid "ad2bd43d-4862-4bae-a767-20d302d1410a")
-		(at 143.31 101.75 180)
+		(at 178.26 81.7 180)
 		(descr "MEC 5G single pole normally-open tactile switch")
 		(tags "switch normally-open pushbutton push-button")
 		(property "Reference" "BOOT1"
-			(at -3.325 -8.575 360)
+			(at -3.325 -8.575 0)
 			(layer "F.SilkS")
 			(uuid "f1981a3c-cc50-4358-bb72-34ad31758617")
 			(effects
@@ -2028,7 +2028,7 @@
 			)
 		)
 		(property "Value" "SW_MEC_5E"
-			(at 0.475 8.825 360)
+			(at 0.475 8.825 0)
 			(layer "F.Fab")
 			(uuid "7b388153-e46c-4750-a04a-da2241eed5db")
 			(effects
@@ -2254,7 +2254,7 @@
 			(uuid "c411b322-4dca-4fd3-b243-080e43908902")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "c6e142e4-318e-4aa5-a0fc-509becfd65f3")
 			(effects
@@ -2812,7 +2812,7 @@
 	(footprint "Capacitor_SMD:C_0805_2012Metric"
 		(layer "F.Cu")
 		(uuid "b98908ae-34eb-4a20-be7e-645eb8e8c361")
-		(at 97.5 69.5 90)
+		(at 132.45 49.45 90)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C2"
@@ -3029,7 +3029,7 @@
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R6"
-			(at 0 -1.65 360)
+			(at 0 -1.65 0)
 			(layer "F.SilkS")
 			(uuid "99ddc98c-3668-485a-94b5-ae64526c8359")
 			(effects
@@ -3040,7 +3040,7 @@
 			)
 		)
 		(property "Value" "1M"
-			(at 0 1.65 360)
+			(at 0 1.65 0)
 			(layer "F.Fab")
 			(uuid "7beb517e-1a14-42fe-8ad7-19cab9a01313")
 			(effects
@@ -3195,7 +3195,7 @@
 			(uuid "6b0cd6c3-be98-4f91-a07e-6c030372cce9")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "8462ad04-9f26-4b7d-b28b-d945031b39bb")
 			(effects
@@ -3238,7 +3238,7 @@
 	(footprint "RF_Module:ESP32-S3-WROOM-1U"
 		(layer "F.Cu")
 		(uuid "bed97288-664c-4246-bfac-5cc80e910411")
-		(at 119.3 77.69)
+		(at 154.25 57.64)
 		(descr "2.4 GHz Wi-Fi and Bluetooth module  https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf")
 		(tags "2.4 GHz Wi-Fi and Bluetooth module")
 		(property "Reference" "U1"
@@ -4556,7 +4556,7 @@
 			(uuid "f14a86da-1627-4d89-a721-2d49222ab18a")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "85dfafad-abd3-4fa0-a45e-5e5f2f3df7df")
 			(effects
@@ -4667,11 +4667,11 @@
 	(footprint "Resistor_SMD:R_0805_2012Metric"
 		(layer "F.Cu")
 		(uuid "f05929d3-2ee1-48c0-a62b-5d80687234de")
-		(at 98.4125 74.5)
+		(at 133.3625 54.45)
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R3"
-			(at 0 -1.65 360)
+			(at 0 -1.65 0)
 			(layer "F.SilkS")
 			(uuid "96b90ee3-a749-469a-b2b6-f857bf20eede")
 			(effects
@@ -4682,7 +4682,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 0 1.65 360)
+			(at 0 1.65 0)
 			(layer "F.Fab")
 			(uuid "1f32af75-d302-4520-a64e-4cef4e9cafed")
 			(effects
@@ -4837,7 +4837,7 @@
 			(uuid "c34b9426-2841-4541-976c-ac0fbac8c614")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "b4ad8d4e-ac34-4ed0-8937-382eb8b99b69")
 			(effects
@@ -5091,8 +5091,8 @@
 		)
 	)
 	(gr_rect
-		(start 85.5 37.5)
-		(end 151.5 170)
+		(start 85 50)
+		(end 200 150)
 		(stroke
 			(width 0.05)
 			(type default)
@@ -5100,5 +5100,29 @@
 		(fill none)
 		(layer "Edge.Cuts")
 		(uuid "0c7aa167-834e-4e61-8215-3fcb04fb35ad")
+	)
+	(gr_text "Haut"
+		(at 127 28.5 0)
+		(layer "Cmts.User")
+		(uuid "10d4c587-0e09-41ec-841f-1e5a885157cb")
+		(effects
+			(font
+				(size 5 5)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "Bas"
+		(at 126.5 189.5 0)
+		(layer "Cmts.User")
+		(uuid "e11e9c9d-3f1c-40b4-bf0e-23d5262bbd8c")
+		(effects
+			(font
+				(size 5 5)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
 	)
 )
