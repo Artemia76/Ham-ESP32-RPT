@@ -33,14 +33,15 @@
 AudioInfo info(22050, 1, 16);
 I2SStream in;
 I2SStream out;
-VolumeMeter VolMeter(out);
-AudioRealFFT fft(VolMeter);
+VolumeMeter volumeMeter(out);
+AudioRealFFT fft;
+MultiOutput multiOutput(volumeMeter,fft);
 CircularBuffer <AudioFFTResult,10> FFTBuf;
 AsyncTimer t;
 WAVDecoder decoder;
 AudioSourceSPIFFS source("/",".wav");
 AudioPlayer player(source,out,decoder);
-StreamCopy copier(fft, in);
+StreamCopy copier(multiOutput, in);
 
 Task task("fft-copy", 10000, 1, 0);
 
@@ -116,7 +117,7 @@ void setup(void)
   //
   // Configure Volume Meter
   //
-  VolMeter.begin(info);
+  volumeMeter.begin(info);
 
   //
   // Configure Player
@@ -150,14 +151,14 @@ void setup(void)
           player.end();
           in.begin();
           fft.begin();
-          VolMeter.begin();
+          volumeMeter.begin();
           break;
         }
         case ANNONCE_DEB:
         {
           in.end();
           fft.end();
-          VolMeter.end();
+          volumeMeter.end();
           player.begin(1);
           player.setAutoNext(false);
           break;
@@ -166,7 +167,7 @@ void setup(void)
         {
           in.end();
           fft.end();
-          VolMeter.end();
+          volumeMeter.end();
           player.begin(0);
           player.setAutoNext(false);
           break;
@@ -218,9 +219,9 @@ bool Is1750Detected ()
 /// @brief Sequence is reviewed each second
 void OnTimer ()
 {
-  if (VolMeter.volumeDB() > SeuilSquelch)
+  if (volumeMeter.volumeDB() > SeuilSquelch)
   {
-    Serial.println("Volume = " + String(VolMeter.volumeDB()));
+    Serial.println("Volume = " + String(volumeMeter.volumeDB()));
     CD = true;
   }
   else
