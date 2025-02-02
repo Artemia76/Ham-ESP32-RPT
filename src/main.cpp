@@ -9,33 +9,35 @@
 //#include <atomic>
 
 // A/D Converter PINs
-
 #define AD_MCLK 0
 #define AD_LRCK 1
 #define AD_SCLK 2
 #define AD_SDIN 3
 
 // D/A Converter PINs
-
 #define DA_MCLK 4
 #define DA_LRCK 5
 #define DA_SCLK 6
 #define DA_SDIN 7
 
 // I/O PINs
-
 #define RX_LED 8
 #define TX_LED 9
 #define ANNONCE_BTN 10
 
+// CONST
+#define CTCSS_LVL 0.2
 
 // Définition des variables globales
 AudioInfo info(22050, 1, 16);
 I2SStream in;
 I2SStream out;
-OutputMixer<int16_t> mixer(out, 2); 
+SineWaveGenerator<int16_t> ctcss_sine;
+GeneratedSoundStream<int16_t> ctcss(ctcss_sine); 
+OutputMixer<int16_t> mixer(out, 3); 
 BufferedStream MixerIn1(1024,mixer);
 BufferedStream MixerIn2(1024,mixer);
+//BufferedStream MixerIn3(1024,mixer);
 VolumeMeter volumeMeter(MixerIn1);
 AudioRealFFT fft;
 MultiOutput multiOutput(volumeMeter,fft);
@@ -45,6 +47,7 @@ WAVDecoder decoder;
 AudioSourceSPIFFS source("/",".wav");
 AudioPlayer player(source,MixerIn2,decoder);
 StreamCopy InCopier(multiOutput, in, 1024);
+StreamCopy ctcss_copier(mixer,ctcss);
 
 //Task task("fft-copy", 10000, 1, 0);
 
@@ -69,6 +72,7 @@ uint8_t Counter = 0;
 void fftResult(AudioFFTBase &fft);
 void OnTimer ();
 bool Is1750Detected ();
+void Actions (const Mode& pState);
 int lastState = HIGH;
 int currentState;
 
@@ -132,13 +136,15 @@ void setup(void)
   player.begin(0,false);
 
 
-
+  //
+  // CTCSS Generator
+  //
+  ctcss_sine.setFrequency(62.5);
+  ctcss.begin(info);
   //
   // Configure Mixer
   //
   mixer.begin(1024);
-  //Mute audio in while not repeating
-  mixer.setWeight(0,0.0);
 
   //
   // Configure I/O
@@ -152,6 +158,8 @@ void setup(void)
   // Configure Slow Timer
   //
   t.setInterval(OnTimer, 1000);
+
+  Actions(IDLE);
 
 }
 
@@ -178,6 +186,59 @@ bool Is1750Detected ()
   return false;
 }
 
+void Actions (const Mode& pState)
+{
+  switch (pState)
+  {
+    case IDLE:
+    {
+      LOGW("IDLE");
+      digitalWrite(RX_LED, HIGH);
+      digitalWrite(TX_LED,LOW);
+      mixer.setWeight(0,0.0);
+      mixer.setWeight(1,0.0);
+      mixer.setWeight(2,0.0);
+      break;
+    }
+    case ANNONCE_DEB:
+    {
+      LOGW("Annonce début");
+      digitalWrite(RX_LED, LOW);
+      digitalWrite(TX_LED,HIGH);
+      //mute input sound still playing welcome
+      mixer.setWeight(0,0.0);
+      mixer.setWeight(1,1.0);
+      mixer.setWeight(2,CTCSS_LVL);
+      player.begin(1);
+      player.setAutoNext(false);
+      break;
+    }
+    case REPEATER:
+    {
+      LOGW("Repeater");
+      digitalWrite(RX_LED, LOW);
+      digitalWrite(TX_LED,HIGH);
+      mixer.setWeight(0,1.0);
+      mixer.setWeight(1,0.0);
+      mixer.setWeight(2,CTCSS_LVL);
+      break;
+    }
+    case ANNONCE_FIN:
+    {
+      LOGW("Annonce Fin");
+      digitalWrite(RX_LED, LOW);
+      digitalWrite(TX_LED,HIGH);
+      mixer.setWeight(0,0.0);
+      mixer.setWeight(1,1.0);
+      mixer.setWeight(2,CTCSS_LVL);
+      player.begin(0);
+      player.setAutoNext(false);
+      break;
+    }
+  }
+  Etat = pState;
+}
+
 /// @brief Sequence is reviewed each second
 void OnTimer ()
 {
@@ -195,9 +256,6 @@ void OnTimer ()
   {
     case IDLE:
     {
-      LOGW("IDLE");
-      digitalWrite(RX_LED, HIGH);
-      digitalWrite(TX_LED,LOW);
       if (Is1750Detected() && CD)
       {
         Counter ++;
@@ -208,55 +266,38 @@ void OnTimer ()
       }
       if (Counter >= 2)
       {
-        //mute input sound still playing welcome
-        player.begin(1);
-        player.setAutoNext(false);
-        Etat = ANNONCE_DEB;
+        Actions(ANNONCE_DEB);
         Counter=0;
       }
       break;
     }
     case ANNONCE_DEB:
     {
-      LOGW("Annonce début");
-      digitalWrite(RX_LED, LOW);
-      digitalWrite(TX_LED,HIGH);
       Counter++;
       if (Counter > 3)
       {
-        mixer.setWeight(0,1.0);
-        Etat = REPEATER;
+        Actions(REPEATER);
         Counter=0;
       }
       break;
     }
     case REPEATER:
     {
-      LOGW("Repeater");
-      digitalWrite(RX_LED, LOW);
-      digitalWrite(TX_LED,HIGH);
       if (!CD) Counter ++;
       else Counter = 0;
       if (Counter > 10)
       {
-        mixer.setWeight(0,0.0);
-        player.begin(0);
-        player.setAutoNext(false);
-        Etat = ANNONCE_FIN;
+        Actions(ANNONCE_FIN);
         Counter=0;
       }
       break;
     }
     case ANNONCE_FIN:
     {
-      LOGW("Annonce Fin");
-      digitalWrite(RX_LED, LOW);
-      digitalWrite(TX_LED,HIGH);
       Counter++;
       if (Counter > 3)
       {
-        mixer.setWeight(0,0.0);
-        Etat = IDLE;
+        Actions(IDLE);
         Counter=0;
       }
       break;
@@ -288,14 +329,14 @@ void loop()
   currentState = digitalRead(ANNONCE_BTN);
   if (lastState == LOW && currentState == HIGH)
   {
-    Etat = ANNONCE_DEB;
-    LOGW("Playing Annonce...");
+    Actions(ANNONCE_DEB);
   }
   lastState = currentState;
   t.handle();
   // Audio Processing
   InCopier.copy();
   player.copy();
+  ctcss_copier.copy();
   if (mixer.size() > 0)
   {
     mixer.flushMixer();
