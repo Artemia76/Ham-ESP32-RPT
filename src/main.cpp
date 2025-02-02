@@ -3,10 +3,8 @@
 #include <AudioTools.h>
 #include <AudioTools/AudioLibs/AudioRealFFT.h>
 #include <AudioTools/AudioLibs/AudioSourceSPIFFS.h>
-//#include <AudioTools/Concurrency/RTOS.h>
 #include <CircularBuffer.hpp>
 #include <AsyncTimer.h>
-//#include <atomic>
 
 // A/D Converter PINs
 #define AD_MCLK 0
@@ -49,8 +47,6 @@ AudioPlayer player(source,MixerIn2,decoder);
 StreamCopy InCopier(multiOutput, in, 1024);
 StreamCopy ctcss_copier(mixer,ctcss);
 
-//Task task("fft-copy", 10000, 1, 0);
-
 enum Mode
 {
   IDLE,
@@ -59,7 +55,6 @@ enum Mode
   ANNONCE_FIN
 };
 
-//std::atomic<Mode> Etat(IDLE);
 Mode Etat = IDLE;
 Mode LastEtat=IDLE;
 
@@ -68,7 +63,7 @@ float mag_ref = 10000000.0;
 float SeuilSquelch = -30.0; //Squelch threshold
 uint8_t Counter = 0;
 
-// Functions Proto
+// Proto
 void fftResult(AudioFFTBase &fft);
 void OnTimer ();
 bool Is1750Detected ();
@@ -100,7 +95,6 @@ void setup(void)
   //
   // Configure out stream
   //
-
   auto configout = out.defaultConfig(TX_MODE);
   configout.copyFrom(info);
   configout.i2s_format = I2S_STD_FORMAT;
@@ -130,7 +124,6 @@ void setup(void)
   //
   // Configure Player
   //
-  //player.setBufferSize(DEFAULT_BUFFER_SIZE);
   player.setAudioInfo(info);
   player.setSilenceOnInactive(true);
   player.begin(0,false);
