@@ -3,10 +3,10 @@
 #include <AudioTools.h>
 #include <AudioTools/AudioLibs/AudioRealFFT.h>
 #include <AudioTools/AudioLibs/AudioSourceSPIFFS.h>
-#include <AudioTools/Concurrency/RTOS.h>
+//#include <AudioTools/Concurrency/RTOS.h>
 #include <CircularBuffer.hpp>
 #include <AsyncTimer.h>
-#include <atomic>
+//#include <atomic>
 
 // A/D Converter PINs
 
@@ -33,17 +33,20 @@
 AudioInfo info(22050, 1, 16);
 I2SStream in;
 I2SStream out;
-VolumeMeter volumeMeter(out);
+OutputMixer<int16_t> mixer(out, 2); 
+BufferedStream MixerIn1(1024,mixer);
+BufferedStream MixerIn2(1024,mixer);
+VolumeMeter volumeMeter(MixerIn1);
 AudioRealFFT fft;
 MultiOutput multiOutput(volumeMeter,fft);
 CircularBuffer <AudioFFTResult,10> FFTBuf;
 AsyncTimer t;
 WAVDecoder decoder;
 AudioSourceSPIFFS source("/",".wav");
-AudioPlayer player(source,out,decoder);
-StreamCopy copier(multiOutput, in);
+AudioPlayer player(source,MixerIn2,decoder);
+StreamCopy InCopier(multiOutput, in, 1024);
 
-Task task("fft-copy", 10000, 1, 0);
+//Task task("fft-copy", 10000, 1, 0);
 
 enum Mode
 {
@@ -53,7 +56,8 @@ enum Mode
   ANNONCE_FIN
 };
 
-std::atomic<Mode> Etat(IDLE);
+//std::atomic<Mode> Etat(IDLE);
+Mode Etat = IDLE;
 Mode LastEtat=IDLE;
 
 bool CD = false;
@@ -122,8 +126,19 @@ void setup(void)
   //
   // Configure Player
   //
-  player.setBufferSize(DEFAULT_BUFFER_SIZE);
+  //player.setBufferSize(DEFAULT_BUFFER_SIZE);
   player.setAudioInfo(info);
+  player.setSilenceOnInactive(true);
+  player.begin(0,false);
+
+
+
+  //
+  // Configure Mixer
+  //
+  mixer.begin(1024);
+  //Mute audio in while not repeating
+  mixer.setWeight(0,0.0);
 
   //
   // Configure I/O
@@ -138,60 +153,6 @@ void setup(void)
   //
   t.setInterval(OnTimer, 1000);
 
-  // Configure Task
-  task.begin([]()
-  {
-    if (LastEtat != Etat)
-    {
-      switch (Etat)
-      {
-        case IDLE:
-        case REPEATER:
-        {
-          player.end();
-          in.begin();
-          fft.begin();
-          volumeMeter.begin();
-          break;
-        }
-        case ANNONCE_DEB:
-        {
-          in.end();
-          fft.end();
-          volumeMeter.end();
-          player.begin(1);
-          player.setAutoNext(false);
-          break;
-        }
-        case ANNONCE_FIN:
-        {
-          in.end();
-          fft.end();
-          volumeMeter.end();
-          player.begin(0);
-          player.setAutoNext(false);
-          break;
-        }
-      }
-      LastEtat = Etat;
-    }
-    switch (Etat)
-    {
-      case IDLE:
-      case REPEATER:
-      {
-        copier.copy();
-        break;
-      }
-      case ANNONCE_DEB:
-      case ANNONCE_FIN:
-      {
-        player.copy();
-        break;
-      }
-    }
-  });
-
 }
 
 /// @brief Detect a 1750 Hz tone 
@@ -204,6 +165,7 @@ bool Is1750Detected ()
   using index_t = decltype(FFTBuf)::index_t;
 	for (index_t i = 0; i < FFTBuf.size(); i++)
   {
+
       //Serial.println( "Freq = " + String(FFTBuf[i].frequency) + " Magnitude = "+ String(FFTBuf[i].magnitude));
 			if (
         (FFTBuf[i].frequency < (1750.0 + tolerance)) &&
@@ -244,8 +206,11 @@ void OnTimer ()
       {
         Counter = 0;
       }
-      if (Counter >= 1)
+      if (Counter >= 2)
       {
+        //mute input sound still playing welcome
+        player.begin(1);
+        player.setAutoNext(false);
         Etat = ANNONCE_DEB;
         Counter=0;
       }
@@ -259,6 +224,7 @@ void OnTimer ()
       Counter++;
       if (Counter > 3)
       {
+        mixer.setWeight(0,1.0);
         Etat = REPEATER;
         Counter=0;
       }
@@ -273,6 +239,9 @@ void OnTimer ()
       else Counter = 0;
       if (Counter > 10)
       {
+        mixer.setWeight(0,0.0);
+        player.begin(0);
+        player.setAutoNext(false);
         Etat = ANNONCE_FIN;
         Counter=0;
       }
@@ -286,6 +255,7 @@ void OnTimer ()
       Counter++;
       if (Counter > 3)
       {
+        mixer.setWeight(0,0.0);
         Etat = IDLE;
         Counter=0;
       }
@@ -323,4 +293,11 @@ void loop()
   }
   lastState = currentState;
   t.handle();
+  // Audio Processing
+  InCopier.copy();
+  player.copy();
+  if (mixer.size() > 0)
+  {
+    mixer.flushMixer();
+  }
 }
