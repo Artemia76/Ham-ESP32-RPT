@@ -25,9 +25,7 @@
 
 /*****************************************************************************/
 
-CApp::CApp (CLog& pLog, CWebServer& pWebServer) :
-    CWebServerEvent(pWebServer),
-    _log(pLog),
+CApp::CApp () :
     _switch(false),
     _info(22050, 1, 16),
     _ctcss(_ctcss_sine),
@@ -36,7 +34,7 @@ CApp::CApp (CLog& pLog, CWebServer& pWebServer) :
     _mixerIn2(1024,_mixer),
     _volumeMeter(_mixerIn1),
     _multiOutput(_volumeMeter,_fft),
-    _source("/wav/",".wav"),
+    _source("/wav",".wav"),
     _player(_source,_mixerIn2,_decoder),
     _inCopier(_multiOutput, _in, 1024),
     _ctcss_copier(_mixer,_ctcss),
@@ -47,10 +45,12 @@ CApp::CApp (CLog& pLog, CWebServer& pWebServer) :
     _seuilSquelch(-30.0),
     _counter(0),
     _lastState(HIGH),
-    _currentState(HIGH)
+    _currentState(HIGH),
+    _CTCSSEnabled(false)
 {
-  _log.Message("Starting Repeater");
-
+  _log = CLog::Create();
+  _log->Message("Starting Repeater");
+  _switch =true;
   //
   // Configure in stream
   //
@@ -86,7 +86,7 @@ CApp::CApp (CLog& pLog, CWebServer& pWebServer) :
   tcfg.length = 512;
   tcfg.copyFrom(_info);
   //tcfg.window_function = new BlackmanHarris;
-  tcfg.callback = &fftResult;
+  tcfg.callback = CApp::fftResultCB;
   _fft.begin(tcfg);
 
   //
@@ -123,7 +123,7 @@ CApp::CApp (CLog& pLog, CWebServer& pWebServer) :
   //
   // Configure Slow Timer
   //
-  _t.setInterval(OnTimer, 1000);
+  _t.setInterval(CApp::OnTimerCB,1000);
 
   Actions(IDLE);
 
@@ -133,7 +133,7 @@ CApp::CApp (CLog& pLog, CWebServer& pWebServer) :
 
 CApp::~CApp ()
 {
-  _log.Message("Ending Repeater");
+  _log->Message("Ending Repeater");
 }
 
 /*****************************************************************************/
@@ -162,15 +162,27 @@ void CApp::Loop ()
 String CApp::onGET (const String& pCommand)
 {
   String Response;
-  if (pCommand=="on")
+  if (pCommand=="RepOn")
   {
+    _log->Message("RepOn");
     _switch = true;
-  } else if (pCommand=="off")
+  } else if (pCommand=="RepOff")
   {
+    _log->Message("RepOff");
     _switch = false;
+    Actions(IDLE);
+  } else if (pCommand=="CTCSSOn")
+  {
+    _log->Message("CTCSSOn");
+    _CTCSSEnabled = true;
+  } else if (pCommand=="CTCSSOff")
+  {
+    _log->Message("CTCSSOff");
+    _CTCSSEnabled = false;
+    _mixer.setWeight(2,0);
   } else if (pCommand=="lireLuminosite")
   {
-    //Response = String(analogRead(_lightSensor));
+    Response = String(_volumeMeter.volumeDB());
   }
   return Response;
 }
@@ -210,11 +222,12 @@ bool CApp::Is1750Detected ()
 
 void CApp::Actions (const Mode& pState)
 {
+  if (!_switch) return;
   switch (pState)
   {
     case IDLE:
     {
-      _log.Message("IDLE");
+      _log->Message("IDLE");
       digitalWrite(RX_LED, HIGH);
       digitalWrite(TX_LED,LOW);
       _mixer.setWeight(0,0.0);
@@ -224,41 +237,46 @@ void CApp::Actions (const Mode& pState)
     }
     case ANNONCE_DEB:
     {
-      _log.Message("Annonce début");
+      _log->Message("Annonce début");
       digitalWrite(RX_LED, LOW);
       digitalWrite(TX_LED,HIGH);
       //mute input sound still playing welcome
       _mixer.setWeight(0,0.0);
       _mixer.setWeight(1,1.0);
-      _mixer.setWeight(2,CTCSS_LVL);
+      if (_CTCSSEnabled) _mixer.setWeight(2,CTCSS_LVL);
       _player.begin(1);
       _player.setAutoNext(false);
       break;
     }
     case REPEATER:
     {
-      _log.Message("Repeater");
+      _log->Message("Repeater");
       digitalWrite(RX_LED, LOW);
       digitalWrite(TX_LED,HIGH);
       _mixer.setWeight(0,1.0);
       _mixer.setWeight(1,0.0);
-      _mixer.setWeight(2,CTCSS_LVL);
+      if (_CTCSSEnabled) _mixer.setWeight(2,CTCSS_LVL);
       break;
     }
     case ANNONCE_FIN:
     {
-      _log.Message("Annonce Fin");
+      _log->Message("Annonce Fin");
       digitalWrite(RX_LED, LOW);
       digitalWrite(TX_LED,HIGH);
       _mixer.setWeight(0,0.0);
       _mixer.setWeight(1,1.0);
-      _mixer.setWeight(2,CTCSS_LVL);
+      if (_CTCSSEnabled) _mixer.setWeight(2,CTCSS_LVL);
       _player.begin(0);
       _player.setAutoNext(false);
       break;
     }
   }
   _etat = pState;
+}
+
+void CApp::OnTimerCB ()
+{
+  CApp::Create()->OnTimer();
 }
 
 /// @brief Sequence is reviewed each second
@@ -325,6 +343,11 @@ void CApp::OnTimer ()
       break;
     }
   }
+}
+
+void CApp::fftResultCB(AudioFFTBase &fft)
+{
+  CApp::Create()->fftResult(fft);
 }
 
 //

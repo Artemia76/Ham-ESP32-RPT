@@ -36,6 +36,7 @@
 #include <AudioTools/AudioLibs/AudioSourceSPIFFS.h>
 #include <CircularBuffer.hpp>
 #include <AsyncTimer.h>
+#include "singleton.hpp"
 
 
 // A/D Converter PINs
@@ -71,29 +72,17 @@ enum Mode
  * 
  */
 
-class CApp : public CWebServerEvent 
+class CApp : public CSingleTon<CApp>, CWebServerEvent 
 {
     friend class CWebServerEvent;
+    friend class CSingleTon<CApp>;
 public:
-    /**
-     * @brief Construct a new Application object
-     * 
-     * @param pLog Text log handler
-     * @param pwebServer Web Server to subscribe events
-     */
-    CApp(CLog& pLog, CWebServer& pWebServer);
-
-    /**
-     * @brief Destroy the main application object
-     * 
-     */
-    ~CApp();
 
     void Loop ();
 
 protected:
 
-    /**
+     /**
      * @brief Event from web server on GET command
      * 
      * @param pCommand 
@@ -110,6 +99,19 @@ protected:
     void onPOST(const String& pCommand, const String& pData);
 
 private:
+    /**
+     * @brief Construct a new Application object
+     * 
+     * @param pLog Text log handler
+     * @param pwebServer Web Server to subscribe events
+     */
+    CApp();
+
+    /**
+     * @brief Destroy the main application object
+     * 
+     */
+    ~CApp();
 
     AudioInfo _info;
     I2SStream _in;
@@ -131,6 +133,8 @@ private:
     StreamCopy _ctcss_copier;
     std::atomic<bool> _switch;
     
+    bool _CTCSSEnabled;
+
     Mode _etat;
     Mode _lastEtat;
 
@@ -141,8 +145,9 @@ private:
     int _lastState;
     int _currentState;
 
-    // Proto
+static void fftResultCB (AudioFFTBase &fft);
     void fftResult(AudioFFTBase &fft);
+static void OnTimerCB ();
     void OnTimer ();
     bool Is1750Detected ();
     void Actions (const Mode& pState);
@@ -152,7 +157,7 @@ private:
      * @brief Log handler to write message on terminal
      * 
      */
-    CLog& _log;
+    CLog* _log;
 };
 
 #endif

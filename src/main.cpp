@@ -1,10 +1,6 @@
 #include <Arduino.h>
 #include "app.hpp"
-#include "webserver.hpp"
-#include "log.hpp"
 
-CLog* Logger;
-CWebServer* WebServer;
 CApp* Application;
 
 /**
@@ -13,9 +9,7 @@ CApp* Application;
  */
 void setup(void)
 {
-  Logger = new CLog();
-  WebServer = new CWebServer(*Logger);
-  Application = new CApp (*Logger, *WebServer);
+  Application = CApp::Create();
 }
 
 /**

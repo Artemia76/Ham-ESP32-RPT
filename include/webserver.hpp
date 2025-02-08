@@ -31,6 +31,7 @@
 
 #include "env.h"
 #include "log.hpp"
+#include "singleton.hpp"
 
 // Use atomic to share async mutlithreaded 
 
@@ -49,7 +50,7 @@ public:
      * 
      * @param pWebServer 
      */
-    CWebServerEvent(CWebServer& pWebServer);
+    CWebServerEvent();
 
     /**
      * @brief Destroy the CWebServerEvent object
@@ -79,7 +80,7 @@ private:
      * @brief Store event controller
      * 
      */
-    CWebServer&  _webServer;
+    CWebServer*  _webServer;
 };
 
 /**
@@ -93,29 +94,34 @@ typedef std::vector<CWebServerEvent*> v_subscribers;
  * 
  * 
  */
-class CWebServer 
+class CWebServer : public CSingleTon<CWebServer>
 {
 friend class CWebServerEvent;
+friend class CSingleTon<CWebServer>;
 public:
+
+
+protected:
+    void _onGetRepOn (AsyncWebServerRequest *request);
+    void _onGetRepOff (AsyncWebServerRequest *request);
+    void _onGetCTCSSOn (AsyncWebServerRequest *request);
+    void _onGetCTCSSOff (AsyncWebServerRequest *request);
+    void _onGetRSSI (AsyncWebServerRequest *request);
+    void _onGetSet (AsyncWebServerRequest *request);
+
+private:
+
     /**
      * @brief Construct a new CWebServer object
      * 
      */
-    CWebServer (CLog& pLog);
+    CWebServer ();
 
     /**
      * @brief Destroy the CWebServer object
      * 
      */
     ~CWebServer ();
-
-protected:
-    void _onGetON (AsyncWebServerRequest *request);
-    void _onGetOFF (AsyncWebServerRequest *request);
-    void _onGetLuminosite (AsyncWebServerRequest *request);
-    void _onGetSet (AsyncWebServerRequest *request);
-
-private:
 
     /**
      * @brief Suscribers container for loop event
@@ -129,7 +135,7 @@ private:
      */
     AsyncWebServer _server;
 
-    CLog& _log;
+    CLog* _log;
 
     // Replace with your network credentials
     const char* _ssid;

@@ -25,14 +25,13 @@
 #define LOG_HPP
 
 #include <Arduino.h>
+#include "singleton.hpp"
 #include <mutex>
 
-class CLog
+class CLog : public CSingleTon<CLog>
 {
+    friend class CSingleTon <CLog>;
 public:
-    CLog();
-    ~CLog();
-
     /**
      * @brief Send message to serial port
      * 
@@ -41,6 +40,9 @@ public:
      */
     void Message(const String& pMessage, bool pCR=true);
 private:
+    CLog();
+    ~CLog();
+
     /**
      * @brief mutex to protect against concurent access
      * 
