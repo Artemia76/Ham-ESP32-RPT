@@ -42,7 +42,8 @@ CWebServerEvent::~CWebServerEvent()
 
 /*****************************************************************************/
 
-CWebServer::CWebServer () : _server (80),
+CWebServer::CWebServer () :
+    _server (80),
     _ssid (WIFI_SSID),
     _password (WIFI_PASSWORD)
 {
