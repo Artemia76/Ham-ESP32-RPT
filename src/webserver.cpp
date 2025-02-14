@@ -1,11 +1,11 @@
 /**
  * @file webserver.cpp
- * @author Artemia
- * @brief Test-ESP32 Project
+ * @author Gianni Peschiutta (F4IKZ)
+ * @brief HAM-ESP32-RPT
  * @version 0.1
- * @date 2024-11-12
+ * @date 2025-02-13
  * 
- * @copyright Copyright (c) 2024
+ * @copyright Copyright (c) 2025
  *
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -45,13 +45,14 @@ CWebServerEvent::~CWebServerEvent()
 CWebServer::CWebServer () :
     _server (80),
     _ssid (WIFI_SSID),
-    _password (WIFI_PASSWORD)
+    _password (WIFI_PASSWORD),
+    _initialized(false)
 {
     _log = CLog::Create();
-
+    int cnt = 0;
     if(!SPIFFS.begin())
     {
-        _log->Message ("Erreur SPIFFS...");
+        _log->Message ("SPIFFS Mounting Error...");
         return;
     }
 
@@ -72,6 +73,12 @@ CWebServer::CWebServer () :
     {
         _log->Message (".", false);
         delay(500);
+        cnt++;
+        if (cnt > 10)
+        {
+            _log->Message("Failed to connect WiFi");
+            return;
+        }
     }
 
     // Print local IP address and start web server
@@ -127,6 +134,7 @@ CWebServer::CWebServer () :
         this->_onGetSet (request);
     });
     _server.begin();
+    _initialized = true;
     _log->Message ("Server Online.");
 }
 

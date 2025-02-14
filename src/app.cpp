@@ -1,7 +1,7 @@
 /**
  * @file app.cpp
- * @author Artemia
- * @brief Test-ESP32 Project
+ * @author Gianni Peschiutta (F4IKZ)
+ * @brief HAM-ESP32-RPT
  * @version 0.1
  * @date 2024-11-21
  * 

@@ -1,11 +1,11 @@
 /**
- * @file env.h
- * @author Artemia
- * @brief Test-ESP32 Project
+ * @file env.hpp
+ * @author Gianni Peschiutta (F4IKZ)
+ * @brief HAM-ESP32-RPT
  * @version 0.1
- * @date 2024-11-21
+ * @date 2025-02-13
  * 
- * @copyright Copyright (c) 2024
+ * @copyright Copyright (c) 2025
  *
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -23,8 +23,8 @@
 
 // Please change SSID and Password strings and remove .dist extension of this file
 
-#ifndef ENV_H
-#define ENV_H
+#ifndef ENV_HPP
+#define ENV_HPP
 
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
@@ -32,4 +32,4 @@
 #define WIFI_SSID "My SSID"
 #define WIFI_PASSWORD "MyVerySecretPassword"
 
-#endif
+#endif //ENV_HPP

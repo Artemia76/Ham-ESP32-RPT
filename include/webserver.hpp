@@ -1,11 +1,11 @@
 /**
  * @file webserver.hpp
- * @author Artemia
- * @brief Test-ESP32 Project
+ * @author Gianni Peschiutta (F4IKZ)
+ * @brief HAM-ESP32-RPT
  * @version 0.1
- * @date 2024-11-21
+ * @date 2025-02-13
  * 
- * @copyright Copyright (c) 2024
+ * @copyright Copyright (c) 2025
  *
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 #include <vector>
 #include <regex>
 
-#include "env.h"
+#include "env.hpp"
 #include "log.hpp"
 #include "singleton.hpp"
 
@@ -135,13 +135,20 @@ private:
      */
     AsyncWebServer _server;
 
+    /**
+     * @brief Log Controller
+     * 
+     */
     CLog* _log;
 
-    // Replace with your network credentials
+    // Wifi credential
     const char* _ssid;
     const char* _password;
 
-        /**
+
+    // Init State
+    bool _initialized;
+    /**
      * @brief Suscribe to webserver events
      * 
      * @param pSubscriber 
