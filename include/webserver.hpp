@@ -87,7 +87,7 @@ private:
  * @brief Container for event clients
  * 
  */
-typedef std::vector<CWebServerEvent*> v_subscribers;
+typedef std::vector<CWebServerEvent*> v_WebServerSubscribers;
 
 /**
  * @brief WebServer to serv frontend HTML website 
@@ -127,7 +127,7 @@ private:
      * @brief Suscribers container for loop event
      * 
      */
-    v_subscribers _subscribers;
+    v_WebServerSubscribers _subscribers;
 
     /**
      * @brief Web Server 

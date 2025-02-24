@@ -1,5 +1,5 @@
 /**
- * @file app.cpp
+ * @file appevent.cpp
  * @author Gianni Peschiutta (F4IKZ)
  * @brief HAM-ESP32-RPT
  * @version 0.1
@@ -20,34 +20,3 @@
  *    You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
-
-#include "app.hpp"
-
-/*****************************************************************************/
-
-CApp::CApp ()
-{
-  _log = CLog::Create();
-  _log->Message("Starting Repeater");
-}
-
-/*****************************************************************************/
-
-CApp::~CApp ()
-{
-  _log->Message("Ending Repeater");
-}
-
-/*****************************************************************************/
-
-void CApp::Loop ()
-{
-  // Audio Processing
-  _inCopier.copy();
-  _player.copy();
-  _ctcss_copier.copy();
-  if (_mixer.size() > 0)
-  {
-    _mixer.flushMixer();
-  }
-}
