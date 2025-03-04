@@ -125,3 +125,43 @@ bool CAudio::Is1750Detected ()
 	}
   return false;
 }
+
+void CAudio::fftResultCB(AudioFFTBase &fft)
+{
+
+}
+
+void CAudio::fftResult(AudioFFTBase &fft)
+{
+
+}
+
+bool CAudio::IsCarriageDetected()
+{
+  Serial.println("Volume = " + String(_volumeMeter.volumeDB()));
+  return (_volumeMeter.volumeDB() > _seuilSquelch);
+}
+
+void CAudio::SetVolume(int pChannel, float pValue)
+{
+  _mixer.setWeight(pChannel, pValue);
+}
+
+void CAudio::Play(int pTrack)
+{
+  _player.begin(pTrack);
+  _player.setAutoNext(false);
+}
+
+
+void CAudio::OnUpdate()
+{
+    // Audio Processing
+    _inCopier.copy();
+    _player.copy();
+    _ctcss_copier.copy();
+    if (_mixer.size() > 0)
+    {
+      _mixer.flushMixer();
+    }
+}

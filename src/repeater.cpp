@@ -10,12 +10,20 @@ CRepeater::CRepeater() :
 {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ",false);
+
+  _audio = CAudio::Create();
+
   //
   // Configure I/O
   //
   pinMode(RX_LED, OUTPUT);
   pinMode(TX_LED, OUTPUT);
   pinMode(ANNONCE_BTN, INPUT_PULLUP);
+  
+  //
+  // Configure Slow Timer
+  //
+  _t.setInterval(CRepeater::OnTimerCB,1000);
 
   Actions(IDLE);
   _log->Message("OK");
@@ -28,15 +36,126 @@ CRepeater::~CRepeater()
 
 void CRepeater::OnTimerCB()
 {
-
+  CRepeater::Create()->OnTimer();
 }
 
 void CRepeater::OnTimer()
 {
+  bool CD=_audio->IsCarriageDetected();
 
+  //Grafcet
+  switch (_etat)
+  {
+    case IDLE:
+    {
+      if (_audio->Is1750Detected() && CD)
+      {
+        _counter ++;
+      }
+      else
+      {
+        _counter = 0;
+      }
+      if (_counter >= 2)
+      {
+        Actions(ANNONCE_DEB);
+        _counter=0;
+      }
+      break;
+    }
+    case ANNONCE_DEB:
+    {
+      _counter++;
+      if (_counter > 3)
+      {
+        Actions(REPEATER);
+        _counter=0;
+      }
+      break;
+    }
+    case REPEATER:
+    {
+      if (! CD) _counter ++;
+      else _counter = 0;
+      if (_counter > 10)
+      {
+        Actions(ANNONCE_FIN);
+        _counter=0;
+      }
+      break;
+    }
+    case ANNONCE_FIN:
+    {
+      _counter++;
+      if (_counter > 3)
+      {
+        Actions(IDLE);
+        _counter=0;
+      }
+      break;
+    }
+  }
+}
+
+void CRepeater::Actions(const Mode& pState)
+{
+  if (!_switch) return;
+  switch (pState)
+  {
+    case IDLE:
+    {
+      _log->Message("IDLE");
+      digitalWrite(RX_LED, HIGH);
+      digitalWrite(TX_LED,LOW);
+      _audio->SetVolume(0,0.0);
+      _audio->SetVolume(1,0.0);
+      _audio->SetVolume(2,0.0);
+      break;
+    }
+    case ANNONCE_DEB:
+    {
+      _log->Message("Annonce début");
+      digitalWrite(RX_LED, LOW);
+      digitalWrite(TX_LED,HIGH);
+      //mute input sound still playing welcome
+      _audio->SetVolume(0,0.0);
+      _audio->SetVolume(1,1.0);
+      if ( _audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
+      _audio->Play(1);
+      break;
+    }
+    case REPEATER:
+    {
+      _log->Message("Repeater");
+      digitalWrite(RX_LED, LOW);
+      digitalWrite(TX_LED,HIGH);
+      _audio->SetVolume(0,1.0);
+      _audio->SetVolume(1,0.0);
+      if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
+      break;
+    }
+    case ANNONCE_FIN:
+    {
+      _log->Message("Annonce Fin");
+      digitalWrite(RX_LED, LOW);
+      digitalWrite(TX_LED,HIGH);
+      _audio->SetVolume(0,0.0);
+      _audio->SetVolume(1,1.0);
+      if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
+      _audio->Play(0);
+      break;
+    }
+  }
+  _etat = pState;
 }
 
 void CRepeater::OnUpdate()
 {
-    
+  _currentState = digitalRead(ANNONCE_BTN);
+  if (_lastState == LOW && _currentState == HIGH)
+  {
+    Actions(ANNONCE_DEB);
+  }
+  _lastState = _currentState;
+  _t.handle();
 }

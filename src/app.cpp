@@ -42,12 +42,11 @@ CApp::~CApp ()
 
 void CApp::Loop ()
 {
-  // Audio Processing
-  _inCopier.copy();
-  _player.copy();
-  _ctcss_copier.copy();
-  if (_mixer.size() > 0)
+  for (auto Subcriber : _subscribers)
   {
-    _mixer.flushMixer();
+      if (Subcriber != nullptr)
+      {
+          Subcriber->OnUpdate();
+      }
   }
 }

@@ -27,6 +27,7 @@
 #include "log.hpp"
 #include "app.hpp"
 #include "singleton.hpp"
+#include "audio.hpp"
 
 #include <AsyncTimer.h>
 #include <atomic>
@@ -67,6 +68,10 @@ protected:
   */
   void onPOST(const String& pCommand, const String& pData);
   
+  /**
+   * @brief Background Update event 
+   * 
+   */
   void OnUpdate();
 
   private:
@@ -78,6 +83,7 @@ protected:
     std::atomic<bool> _switch;
 
     CLog* _log;
+    CAudio* _audio;
     uint8_t _counter;
     AsyncTimer _t;
     int _lastState;

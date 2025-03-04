@@ -25,6 +25,7 @@
 #define AUDIO_HPP
 
 #include "log.hpp"
+#include "appevent.hpp"
 #include "singleton.hpp"
 #include "AudioConfigLocal.h"
 #include <AudioTools.h>
@@ -52,10 +53,18 @@
  * 
  */
 
-class CAudio : CSingleTon<CAudio>
+class CAudio : public CSingleTon<CAudio>, CAppEvent
 {
 public:
+
     bool Is1750Detected ();
+    bool IsCarriageDetected();
+    bool IsCTCSSEnabled();
+    void SetVolume(int pChannel, float pValue);
+    void Play(int pTrack);
+
+protected:
+    void OnUpdate();
 
 private:
     CAudio();
