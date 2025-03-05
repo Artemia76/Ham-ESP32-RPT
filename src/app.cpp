@@ -50,3 +50,20 @@ void CApp::Loop ()
       }
   }
 }
+
+/*****************************************************************************/
+
+void CApp::_subscribe(CAppEvent* pSubscriber)
+{
+    if (std::find(_subscribers.begin(), _subscribers.end(),pSubscriber) == _subscribers.end())
+    {
+        _subscribers.push_back(pSubscriber);
+    }
+}
+
+/*****************************************************************************/
+
+void CApp::_unSubscribe(CAppEvent* pSubscriber)
+{
+    _subscribers.erase(std::remove(_subscribers.begin(), _subscribers.end(), pSubscriber), _subscribers.end());
+}

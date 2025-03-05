@@ -47,6 +47,7 @@ enum Mode
 
 class CRepeater : public CSingleTon<CRepeater>, CAppEvent
 {
+  friend class CSingleTon<CRepeater>;
 public:
     void Actions (const Mode& pState);
 

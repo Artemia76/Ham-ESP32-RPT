@@ -20,3 +20,16 @@
  *    You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
+
+ #include "app.hpp"
+
+ CAppEvent::CAppEvent ()
+ {
+    _app = CApp::Create();
+    _app->_subscribe(this);
+ }
+
+ CAppEvent::~CAppEvent ()
+ {
+    _app->_unSubscribe(this);
+ }

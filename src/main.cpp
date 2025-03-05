@@ -23,6 +23,8 @@
 
 #include <Arduino.h>
 #include "app.hpp"
+#include "audio.hpp"
+#include "repeater.hpp"
 
 CApp* Application;
 
@@ -33,6 +35,7 @@ CApp* Application;
 void setup(void)
 {
   Application = CApp::Create();
+  CRepeater::Create();
 }
 
 /**

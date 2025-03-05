@@ -128,12 +128,20 @@ bool CAudio::Is1750Detected ()
 
 void CAudio::fftResultCB(AudioFFTBase &fft)
 {
-
+  CAudio::Create()->fftResult(fft);
 }
 
 void CAudio::fftResult(AudioFFTBase &fft)
 {
-
+  float diff;
+  float CarriageAvg=0.0;
+  AudioFFTResult Score[5];
+  fft.resultArray(Score);
+  for (AudioFFTResult Line : Score)
+  {
+    CarriageAvg += Line.magnitude / 5;
+    _FFTBuf.push(Line);
+  }
 }
 
 bool CAudio::IsCarriageDetected()

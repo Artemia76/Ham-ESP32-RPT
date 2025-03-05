@@ -26,12 +26,27 @@
 
 #include <Arduino.h>
 
-#include "appevent.hpp"
 #include "webserver.hpp"
 #include "log.hpp"
 
 #include <vector>
 #include "singleton.hpp"
+
+class CApp;
+
+class CAppEvent
+{
+    friend CApp;
+public:
+    CAppEvent ();
+    ~CAppEvent ();
+
+protected:
+    virtual void OnUpdate()=0;
+
+private:
+    CApp* _app;
+};
 
 /**
  * @brief Container for event clients
@@ -47,16 +62,15 @@ typedef std::vector<CAppEvent*> v_CAppSubscribers;
 class CApp : public CSingleTon<CApp>
 {
     friend class CSingleTon<CApp>;
+    friend class CAppEvent;
 public:
 
     void Loop ();
 
 private:
     /**
-     * @brief Construct a new Application object
+     * @brief Construct a new CApp object
      * 
-     * @param pLog Text log handler
-     * @param pwebServer Web Server to subscribe events
      */
     CApp();
 

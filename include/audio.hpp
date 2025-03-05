@@ -25,7 +25,7 @@
 #define AUDIO_HPP
 
 #include "log.hpp"
-#include "appevent.hpp"
+#include "app.hpp"
 #include "singleton.hpp"
 #include "AudioConfigLocal.h"
 #include <AudioTools.h>
@@ -55,6 +55,7 @@
 
 class CAudio : public CSingleTon<CAudio>, CAppEvent
 {
+    friend class CSingleTon <CAudio>;
 public:
 
     bool Is1750Detected ();
@@ -69,6 +70,7 @@ protected:
 private:
     CAudio();
     ~CAudio();
+
     CLog* _log;
     AudioInfo _info;
     I2SStream _in;
