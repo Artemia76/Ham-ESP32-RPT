@@ -33,12 +33,27 @@ class CLog : public CSingleTon<CLog>
     friend class CSingleTon <CLog>;
 public:
     /**
+     * @brief Enumaration of critical level
+     * 
+     */
+     enum Level
+     {
+        NORMAL = 0,
+        WARNING,
+        ERROR,
+        DEBUG
+     };
+
+    /**
      * @brief Send message to serial port
      * 
      * @param pMessage Message to display
      * @param pCR Cariage Return if True
      */
-    void Message(const String& pMessage, bool pCR=true);
+    void Message(const String& pMessage, bool pCR=true, Level pLevel = NORMAL);
+
+
+    void SetLevel (Level pLevel);
 private:
     CLog();
     ~CLog();
@@ -48,5 +63,7 @@ private:
      * 
      */
     std::mutex _mutex;
+
+    Level _level;
 };
 #endif

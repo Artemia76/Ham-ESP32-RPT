@@ -33,9 +33,11 @@
 #include <atomic>
 
 // I/O PINs
-#define RX_LED 8
-#define TX_LED 9
-#define ANNONCE_BTN 10
+#define RSSI 8
+#define RX_LED 9
+#define TX_LED 10
+#define ANNONCE_BTN 11
+#define PTT 12
 
 enum Mode
 {

@@ -22,6 +22,7 @@
  */
 
 #include "log.hpp"
+#include "env.hpp"
 
 /*****************************************************************************/
 
@@ -30,6 +31,11 @@ CLog::CLog ()
     Serial.begin(115200);
     //while(!Serial){} // Wait until serial monitor is online
     Message ("Starting logging");
+#ifdef DBG
+    _level = DEBUG;
+#else
+    _level = NORMAL;
+#endif
 }
 
 /*****************************************************************************/
@@ -41,9 +47,10 @@ CLog::~CLog ()
 
 /*****************************************************************************/
 
-void CLog::Message (const String& pMessage, bool pCR)
+void CLog::Message (const String& pMessage, bool pCR, Level pLevel)
 {
     std::lock_guard<std::mutex> lck(_mutex);
+    if (pLevel > _level) return;
     if (Serial)
     {
         if (pCR)
@@ -55,4 +62,12 @@ void CLog::Message (const String& pMessage, bool pCR)
             Serial.print(pMessage);
         }
     }
+}
+
+/*****************************************************************************/
+
+void CLog::SetLevel (Level pLevel)
+{
+    std::lock_guard<std::mutex> lck(_mutex);
+    _level = pLevel;
 }

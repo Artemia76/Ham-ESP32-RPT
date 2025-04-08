@@ -144,6 +144,11 @@ void CAudio::fftResult(AudioFFTBase &fft)
   }
 }
 
+bool CAudio::IsCTCSSEnabled()
+{
+  return _CTCSSEnabled;
+}
+
 bool CAudio::IsCarriageDetected()
 {
   Serial.println("Volume = " + String(_volumeMeter.volumeDB()));

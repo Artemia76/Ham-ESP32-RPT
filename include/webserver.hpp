@@ -60,18 +60,12 @@ public:
 
 protected:
 
-    /**
-     * @brief Process HTTP GET CommandEvent Callback
-     * 
-     * @param pCommand 
-     */
 virtual String onGET(const String& pCommand)=0;
 
     /**
-     * @brief Process HTTP POST CommandEvent Callback
+     * @brief Process HTTP GET CommandEvent Callback
      * 
-     * @param pCommand POST Command received
-     * @param pData Data received 
+     * @param pCommand // #define DEBUG
      */
 virtual void onPOST(const String& pCommand, const String& pData)=0;
 

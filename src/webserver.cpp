@@ -157,9 +157,7 @@ void CWebServer::_onGetRepOn (AsyncWebServerRequest *request)
         }
     }
     request->send(200);
-    #ifdef DEBUG
-        _log.Message ("Received ON.");
-    #endif
+    _log->Message ("Received ON.", true , CLog::Level::DEBUG);
 }
 
 /*****************************************************************************/
@@ -174,9 +172,7 @@ void CWebServer::_onGetRepOff (AsyncWebServerRequest *request)
         }
     }
     request->send(200);
-    #ifdef DEBUG
-        _log.Message ("Received ON.");
-    #endif
+    _log->Message ("Received RepOff.", true , CLog::Level::DEBUG);
 }
 
 /*****************************************************************************/
@@ -191,9 +187,7 @@ void CWebServer::_onGetCTCSSOn (AsyncWebServerRequest *request)
         }
     }
     request->send(200);
-    #ifdef DEBUG
-        _log.Message ("Received ON.");
-    #endif
+    _log->Message ("Received CTCSSOn.", true, CLog::Level::DEBUG);
 }
 
 /*****************************************************************************/
@@ -208,9 +202,7 @@ void CWebServer::_onGetCTCSSOff (AsyncWebServerRequest *request)
         }
     }
     request->send(200);
-    #ifdef DEBUG
-        _log.Message ("Received ON.");
-    #endif
+    _log->Message ("Received CTCSSOff.", true, CLog::Level::DEBUG);
 }
 
 /*****************************************************************************/
@@ -226,9 +218,7 @@ void CWebServer::_onGetRSSI (AsyncWebServerRequest *request)
         }
     }
     request->send(200,"text/plain", Value);
-#ifdef DEBUG
-    _log.Message ("Received lireLuminosite = " +luminosite);
-#endif
+    _log->Message ("Received lireLuminosite = " + Value, true, CLog::Level::DEBUG);
 }
 
 /*****************************************************************************/
@@ -249,11 +239,7 @@ void CWebServer::_onGetSet (AsyncWebServerRequest *request)
         }
     }
     request->send(200);
-#ifdef DEBUG
-    _log.Message ("rgb: ");
-    _log.Message (j->value());                     // value ^
-    _log.Message ("");
-#endif
+
 }
 
 /*****************************************************************************/
