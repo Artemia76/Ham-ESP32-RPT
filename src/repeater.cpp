@@ -6,12 +6,16 @@ CRepeater::CRepeater() :
     _counter(0),
     _lastState(HIGH),
     _currentState(HIGH),
-    _switch(false)
+    _switch(true),
+    _CD_Threshold(300),
+    _CD(false)
 {
   _log = CLog::Create();
-  _log->Message("Starting Repeater... ",false);
+  _log->Message("Starting Repeater... ");
 
   _audio = CAudio::Create();
+  _RSSI = analogRead(RSSI);
+  _lastCD = _CD;
 
   //
   // Configure I/O
@@ -41,14 +45,12 @@ void CRepeater::OnTimerCB()
 
 void CRepeater::OnTimer()
 {
-  bool CD=_audio->IsCarriageDetected();
-
   //Grafcet
   switch (_etat)
   {
     case IDLE:
     {
-      if (_audio->Is1750Detected() && CD)
+      if (_audio->Is1750Detected() && _CD)
       {
         _counter ++;
       }
@@ -75,7 +77,7 @@ void CRepeater::OnTimer()
     }
     case REPEATER:
     {
-      if (! CD) _counter ++;
+      if (! _CD) _counter ++;
       else _counter = 0;
       if (_counter > 10)
       {
@@ -121,7 +123,7 @@ void CRepeater::Actions(const Mode& pState)
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
       if ( _audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
-      _audio->Play(1);
+      _audio->Play("welcome.wav");
       break;
     }
     case REPEATER:
@@ -142,7 +144,7 @@ void CRepeater::Actions(const Mode& pState)
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
-      _audio->Play(0);
+      _audio->Play("end.wav");
       break;
     }
   }
@@ -157,5 +159,13 @@ void CRepeater::OnUpdate()
     Actions(ANNONCE_DEB);
   }
   _lastState = _currentState;
+  // Read RSSI and if threshold, play a K
+  _RSSI = analogRead(RSSI);
+  _CD = (_RSSI > _CD_Threshold);
+  if (_CD != _lastCD)
+  {
+    _lastCD = _CD;
+    if ((!_CD) && (_etat == REPEATER)) _audio->Play("beep.wav");
+  }
   _t.handle();
 }

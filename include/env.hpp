@@ -33,6 +33,6 @@
 #define WIFI_PASSWORD "$s900mt1$So2050%"
 
 // To activate Debug message, just uncomment the next line
-#define DBG
+//#define DBG
 
 #endif //ENV_HPP

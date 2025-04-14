@@ -91,7 +91,10 @@ protected:
     AsyncTimer _t;
     int _lastState;
     int _currentState;
-
+    int _RSSI;
+    bool _lastCD;
+    bool _CD;
+    int _CD_Threshold; //RSSI threshold(Squelch)
     static void OnTimerCB ();
     void OnTimer ();
 

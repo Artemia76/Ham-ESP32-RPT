@@ -28,14 +28,14 @@
 CApp::CApp ()
 {
   _log = CLog::Create();
-  _log->Message("Starting Repeater");
+  _log->Message("Starting Application... OK");
 }
 
 /*****************************************************************************/
 
 CApp::~CApp ()
 {
-  _log->Message("Ending Repeater");
+  _log->Message("Ending Application");
 }
 
 /*****************************************************************************/

@@ -31,15 +31,16 @@
     _mixerIn2(1024,_mixer),
     _volumeMeter(_mixerIn1),
     _multiOutput(_volumeMeter,_fft),
-    _source("/wav",".wav"),
-    _player(_source,_mixerIn2,_decoder),
+    //_player(_source,_mixerIn2,_decoder),
     _inCopier(_multiOutput, _in, 1024),
+    _wavCopier(_decoder,_audioFile),
     _ctcss_copier(_mixer,_ctcss),
-    _CD(false),
     _mag_ref(10000000.0),
-    _seuilSquelch(-30.0),
-    _CTCSSEnabled(false)
+    _CTCSSEnabled(false),
+    _decoder(&_mixerIn2, new WAVDecoder())
 {
+    _log = CLog::Create();
+    _log->Message("Starting Audio... ",false);
     //
     // Configure in stream
     //
@@ -86,11 +87,10 @@
     //
     // Configure Player
     //
-    _player.setAudioInfo(_info);
-    _player.setSilenceOnInactive(true);
-    _player.begin(0,false);
-
-
+    //_player.setAudioInfo(_info);
+    //_player.setSilenceOnInactive(true);
+    //_player.begin(0,false);
+    _decoder.begin();
     //
     // CTCSS Generator
     //
@@ -101,6 +101,25 @@
     //
     _mixer.begin(1024);
 
+    if(!SPIFFS.begin())
+    {
+        _log->Message ("SPIFFS Mounting Error...");
+        return;
+    }
+
+    //Load Wav files
+    File root =  SPIFFS.open("/wav");
+    File file  = root.openNextFile();
+
+    while(file)
+    {
+        _log->Message ("Audio files: " + String(file.name()));
+        _catalog[String(file.name())]=file;
+        file.close();
+        file = root.openNextFile();
+    }
+
+    _log->Message("OK");
 }
 
 /// @brief Detect a 1750 Hz tone 
@@ -149,21 +168,20 @@ bool CAudio::IsCTCSSEnabled()
   return _CTCSSEnabled;
 }
 
-bool CAudio::IsCarriageDetected()
-{
-  Serial.println("Volume = " + String(_volumeMeter.volumeDB()));
-  return (_volumeMeter.volumeDB() > _seuilSquelch);
-}
-
 void CAudio::SetVolume(int pChannel, float pValue)
 {
   _mixer.setWeight(pChannel, pValue);
 }
 
-void CAudio::Play(int pTrack)
+void CAudio::Play(const String& pSound)
 {
-  _player.begin(pTrack);
-  _player.setAutoNext(false);
+  if (auto sound = _catalog.find(pSound); sound != _catalog.end())
+  {
+    _log->Message("Playing sound = " + String(sound->first));
+    _audioFile = SPIFFS.open("/wav/"+ sound->first);//sound->second;
+  }
+  //_player.begin(pTrack);
+  //_player.setAutoNext(false);
 }
 
 
@@ -171,8 +189,9 @@ void CAudio::OnUpdate()
 {
     // Audio Processing
     _inCopier.copy();
-    _player.copy();
+    //_player.copy();
     _ctcss_copier.copy();
+    _wavCopier.copy();
     if (_mixer.size() > 0)
     {
       _mixer.flushMixer();

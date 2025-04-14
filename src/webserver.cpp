@@ -49,6 +49,7 @@ CWebServer::CWebServer () :
     _initialized(false)
 {
     _log = CLog::Create();
+    _log->Message ("Starting WebServer... ");
     int cnt = 0;
     if(!SPIFFS.begin())
     {
@@ -56,7 +57,7 @@ CWebServer::CWebServer () :
         return;
     }
 
-    File root =  SPIFFS.open("/");
+    File root =  SPIFFS.open("/web");
     File file  = root.openNextFile();
 
     while(file)
