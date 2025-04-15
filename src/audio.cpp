@@ -29,15 +29,15 @@
     _mixer(_out, 3),
     _mixerIn1(1024,_mixer),
     _mixerIn2(1024,_mixer),
-    _volumeMeter(_mixerIn1),
-    _multiOutput(_volumeMeter,_fft),
-    //_player(_source,_mixerIn2,_decoder),
+    //_volumeMeter(_mixerIn1),
+    _multiOutput(_mixerIn1,_fft),
+    _source("/wav",".wav"),
+    _player(_source,_mixerIn2,_decoder),
     _inCopier(_multiOutput, _in, 1024),
-    _wavCopier(_decoder,_audioFile),
+    //_wavCopier(_decoder,_audioFile),
     _ctcss_copier(_mixer,_ctcss),
     _mag_ref(10000000.0),
-    _CTCSSEnabled(false),
-    _decoder(&_mixerIn2, new WAVDecoder())
+    _CTCSSEnabled(false)
 {
     _log = CLog::Create();
     _log->Message("Starting Audio... ",false);
@@ -82,15 +82,15 @@
     //
     // Configure Volume Meter
     //
-    _volumeMeter.begin(_info);
+    //_volumeMeter.begin(_info);
 
     //
     // Configure Player
     //
-    //_player.setAudioInfo(_info);
-    //_player.setSilenceOnInactive(true);
-    //_player.begin(0,false);
-    _decoder.begin();
+    _player.setAudioInfo(_info);
+    _player.setSilenceOnInactive(true);
+    _player.begin(0,false);
+
     //
     // CTCSS Generator
     //
@@ -100,24 +100,6 @@
     // Configure Mixer
     //
     _mixer.begin(1024);
-
-    if(!SPIFFS.begin())
-    {
-        _log->Message ("SPIFFS Mounting Error...");
-        return;
-    }
-
-    //Load Wav files
-    File root =  SPIFFS.open("/wav");
-    File file  = root.openNextFile();
-
-    while(file)
-    {
-        _log->Message ("Audio files: " + String(file.name()));
-        _catalog[String(file.name())]=file;
-        file.close();
-        file = root.openNextFile();
-    }
 
     _log->Message("OK");
 }
@@ -175,13 +157,9 @@ void CAudio::SetVolume(int pChannel, float pValue)
 
 void CAudio::Play(const String& pSound)
 {
-  if (auto sound = _catalog.find(pSound); sound != _catalog.end())
-  {
-    _log->Message("Playing sound = " + String(sound->first));
-    _audioFile = SPIFFS.open("/wav/"+ sound->first);//sound->second;
-  }
   //_player.begin(pTrack);
-  //_player.setAutoNext(false);
+  _player.setPath(pSound.c_str());
+  _player.setAutoNext(false);
 }
 
 
@@ -189,9 +167,9 @@ void CAudio::OnUpdate()
 {
     // Audio Processing
     _inCopier.copy();
-    //_player.copy();
+    _player.copy();
     _ctcss_copier.copy();
-    _wavCopier.copy();
+    //_wavCopier.copy();
     if (_mixer.size() > 0)
     {
       _mixer.flushMixer();

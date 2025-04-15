@@ -30,8 +30,7 @@
 #include "AudioConfigLocal.h"
 #include <AudioTools.h>
 #include <AudioTools/AudioLibs/AudioRealFFT.h>
-#include <AudioTools/AudioCodecs/CodecWAV.h>
-#include <SPIFFS.h>
+#include <AudioTools/AudioLibs/AudioSourceSPIFFS.h>
 #include <map>
 #include <CircularBuffer.hpp>
 
@@ -81,16 +80,15 @@ private:
     OutputMixer<int16_t> _mixer; 
     BufferedStream _mixerIn1;
     BufferedStream _mixerIn2;
-    VolumeMeter _volumeMeter;
+    //VolumeMeter _volumeMeter;
     AudioRealFFT _fft;
     MultiOutput _multiOutput;
     CircularBuffer <AudioFFTResult,10> _FFTBuf;
-    EncodedAudioStream _decoder;
-    File _audioFile;
-    //AudioPlayer _player;
+    WAVDecoder _decoder;
+    AudioSourceSPIFFS _source;
+    AudioPlayer _player;
     StreamCopy _inCopier;
     StreamCopy _ctcss_copier;
-    StreamCopy _wavCopier;
 
     bool _CTCSSEnabled;
     float _mag_ref;
