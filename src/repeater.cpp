@@ -7,7 +7,7 @@ CRepeater::CRepeater() :
     _lastState(HIGH),
     _currentState(HIGH),
     _switch(true),
-    _CD_Threshold(300),
+    _CD_Threshold(3000),
     _CD(false)
 {
   _log = CLog::Create();
@@ -97,6 +97,7 @@ void CRepeater::OnTimer()
       break;
     }
   }
+  _log->Message("RSSI=" + String(_RSSI),true, CLog::DEBUG);
 }
 
 void CRepeater::Actions(const Mode& pState)
@@ -161,6 +162,7 @@ void CRepeater::OnUpdate()
   _lastState = _currentState;
   // Read RSSI and if threshold, play a K
   _RSSI = analogRead(RSSI);
+
   _CD = (_RSSI > _CD_Threshold);
   if (_CD != _lastCD)
   {

@@ -29,10 +29,10 @@
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
-#define WIFI_SSID "Delgia"
-#define WIFI_PASSWORD "$s900mt1$So2050%"
+#define WIFI_SSID "shtsf"
+#define WIFI_PASSWORD "f6kohshtsf"
 
 // To activate Debug message, just uncomment the next line
-//#define DBG
+#define DBG
 
 #endif //ENV_HPP

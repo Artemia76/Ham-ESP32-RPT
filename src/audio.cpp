@@ -115,7 +115,7 @@ bool CAudio::Is1750Detected ()
 	for (index_t i = 0; i < _FFTBuf.size(); i++)
   {
 
-      //Serial.println( "Freq = " + String(FFTBuf[i].frequency) + " Magnitude = "+ String(FFTBuf[i].magnitude));
+      _log->Message("Freq = " + String(_FFTBuf[i].frequency) + " Magnitude = "+ String(_FFTBuf[i].magnitude),true,CLog::DEBUG);
 			if (
         (_FFTBuf[i].frequency < (1750.0 + tolerance)) &&
         (_FFTBuf[i].frequency > (1750.0-tolerance)) &&

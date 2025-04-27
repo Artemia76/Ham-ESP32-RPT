@@ -34,8 +34,8 @@
 
 // I/O PINs
 #define RSSI 8
-#define RX_LED 9
-#define TX_LED 10
+#define RX_LED 10
+#define TX_LED 9
 #define ANNONCE_BTN 11
 #define PTT 12
 
