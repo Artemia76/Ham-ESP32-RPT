@@ -25,6 +25,7 @@
 #include "app.hpp"
 #include "audio.hpp"
 #include "repeater.hpp"
+#include "webserver.hpp"
 
 CApp* Application;
 
@@ -34,8 +35,10 @@ CApp* Application;
  */
 void setup(void)
 {
+  delay(5000);
   Application = CApp::Create();
   CRepeater::Create();
+  CWebServer::Create();
 }
 
 /**

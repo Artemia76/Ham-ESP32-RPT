@@ -30,12 +30,13 @@ CLog::CLog ()
 {
     Serial.begin(115200);
     //while(!Serial){} // Wait until serial monitor is online
-    Message ("Starting logging");
+    Message ("Starting logging... ", false);
 #ifdef DBG
     _level = DEBUG;
 #else
     _level = NORMAL;
 #endif
+    Message ("OK");
 }
 
 /*****************************************************************************/

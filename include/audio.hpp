@@ -31,6 +31,7 @@
 #include <AudioTools.h>
 #include <AudioTools/AudioLibs/AudioRealFFT.h>
 #include <AudioTools/AudioLibs/AudioSourceSPIFFS.h>
+#include <map>
 #include <CircularBuffer.hpp>
 
 // A/D Converter PINs
@@ -59,10 +60,9 @@ class CAudio : public CSingleTon<CAudio>, CAppEvent
 public:
 
     bool Is1750Detected ();
-    bool IsCarriageDetected();
     bool IsCTCSSEnabled();
     void SetVolume(int pChannel, float pValue);
-    void Play(int pTrack);
+    void Play(const String& pSound);
 
 protected:
     void OnUpdate();
@@ -80,7 +80,7 @@ private:
     OutputMixer<int16_t> _mixer; 
     BufferedStream _mixerIn1;
     BufferedStream _mixerIn2;
-    VolumeMeter _volumeMeter;
+    //VolumeMeter _volumeMeter;
     AudioRealFFT _fft;
     MultiOutput _multiOutput;
     CircularBuffer <AudioFFTResult,10> _FFTBuf;
@@ -91,10 +91,8 @@ private:
     StreamCopy _ctcss_copier;
 
     bool _CTCSSEnabled;
-    bool _CD;
     float _mag_ref;
-    float _seuilSquelch; //Squelch threshold
-    
+    std::map <String, File> _catalog;
     static void fftResultCB (AudioFFTBase &fft);
     void fftResult(AudioFFTBase &fft);
 };

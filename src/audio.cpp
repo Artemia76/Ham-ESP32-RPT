@@ -29,17 +29,18 @@
     _mixer(_out, 3),
     _mixerIn1(1024,_mixer),
     _mixerIn2(1024,_mixer),
-    _volumeMeter(_mixerIn1),
-    _multiOutput(_volumeMeter,_fft),
+    //_volumeMeter(_mixerIn1),
+    _multiOutput(_mixerIn1,_fft),
     _source("/wav",".wav"),
     _player(_source,_mixerIn2,_decoder),
     _inCopier(_multiOutput, _in, 1024),
+    //_wavCopier(_decoder,_audioFile),
     _ctcss_copier(_mixer,_ctcss),
-    _CD(false),
     _mag_ref(10000000.0),
-    _seuilSquelch(-30.0),
     _CTCSSEnabled(false)
 {
+    _log = CLog::Create();
+    _log->Message("Starting Audio... ",false);
     //
     // Configure in stream
     //
@@ -81,7 +82,7 @@
     //
     // Configure Volume Meter
     //
-    _volumeMeter.begin(_info);
+    //_volumeMeter.begin(_info);
 
     //
     // Configure Player
@@ -89,7 +90,6 @@
     _player.setAudioInfo(_info);
     _player.setSilenceOnInactive(true);
     _player.begin(0,false);
-
 
     //
     // CTCSS Generator
@@ -101,6 +101,7 @@
     //
     _mixer.begin(1024);
 
+    _log->Message("OK");
 }
 
 /// @brief Detect a 1750 Hz tone 
@@ -114,7 +115,7 @@ bool CAudio::Is1750Detected ()
 	for (index_t i = 0; i < _FFTBuf.size(); i++)
   {
 
-      //Serial.println( "Freq = " + String(FFTBuf[i].frequency) + " Magnitude = "+ String(FFTBuf[i].magnitude));
+      _log->Message("Freq = " + String(_FFTBuf[i].frequency) + " Magnitude = "+ String(_FFTBuf[i].magnitude),true,CLog::DEBUG);
 			if (
         (_FFTBuf[i].frequency < (1750.0 + tolerance)) &&
         (_FFTBuf[i].frequency > (1750.0-tolerance)) &&
@@ -149,20 +150,15 @@ bool CAudio::IsCTCSSEnabled()
   return _CTCSSEnabled;
 }
 
-bool CAudio::IsCarriageDetected()
-{
-  Serial.println("Volume = " + String(_volumeMeter.volumeDB()));
-  return (_volumeMeter.volumeDB() > _seuilSquelch);
-}
-
 void CAudio::SetVolume(int pChannel, float pValue)
 {
   _mixer.setWeight(pChannel, pValue);
 }
 
-void CAudio::Play(int pTrack)
+void CAudio::Play(const String& pSound)
 {
-  _player.begin(pTrack);
+  //_player.begin(pTrack);
+  _player.setPath(pSound.c_str());
   _player.setAutoNext(false);
 }
 
@@ -173,6 +169,7 @@ void CAudio::OnUpdate()
     _inCopier.copy();
     _player.copy();
     _ctcss_copier.copy();
+    //_wavCopier.copy();
     if (_mixer.size() > 0)
     {
       _mixer.flushMixer();

@@ -34,8 +34,8 @@
 
 // I/O PINs
 #define RSSI 8
-#define RX_LED 9
-#define TX_LED 10
+#define RX_LED 10
+#define TX_LED 9
 #define ANNONCE_BTN 11
 #define PTT 12
 
@@ -91,7 +91,10 @@ protected:
     AsyncTimer _t;
     int _lastState;
     int _currentState;
-
+    int _RSSI;
+    bool _lastCD;
+    bool _CD;
+    int _CD_Threshold; //RSSI threshold(Squelch)
     static void OnTimerCB ();
     void OnTimer ();
 
