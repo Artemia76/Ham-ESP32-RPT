@@ -88,15 +88,22 @@ protected:
     CLog* _log;
     CAudio* _audio;
     uint8_t _counter;
-    AsyncTimer _t;
+    AsyncTimer _t1s;
+    AsyncTimer _t500ms;
     int _lastState;
     int _currentState;
     int _RSSI;
+    int _TOT;
+    int _TOT_Counter;
     bool _lastCD;
     bool _CD;
+    int _antiBounce;
     int _CD_Threshold; //RSSI threshold(Squelch)
-    static void OnTimerCB ();
-    void OnTimer ();
+    bool _HalfSecondBlink;
+    static void OnTimer1SCB ();
+    static void OnTimer500msCB ();
+    void OnTimer1S ();
+    void OnTimer500ms ();
 
 };
 

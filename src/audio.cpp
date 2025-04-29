@@ -89,6 +89,7 @@
     //
     _player.setAudioInfo(_info);
     _player.setSilenceOnInactive(true);
+    _player.setAutoFade(true);
     _player.begin(0,false);
 
     //
@@ -152,6 +153,8 @@ bool CAudio::IsCTCSSEnabled()
 
 void CAudio::SetVolume(int pChannel, float pValue)
 {
+  if ((pChannel < 0) || (pChannel > 2)) return;
+  if ((pValue < 0.0) || (pValue > 1.0)) return;
   _mixer.setWeight(pChannel, pValue);
 }
 
@@ -161,7 +164,6 @@ void CAudio::Play(const String& pSound)
   _player.setPath(String("/wav/" + pSound).c_str());
   _player.setAutoNext(false);
 }
-
 
 void CAudio::OnUpdate()
 {

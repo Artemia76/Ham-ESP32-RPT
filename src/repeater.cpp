@@ -8,7 +8,11 @@ CRepeater::CRepeater() :
     _currentState(HIGH),
     _switch(true),
     _CD_Threshold(3000),
-    _CD(false)
+    _CD(false),
+    _antiBounce(0),
+    _TOT(180),
+    _TOT_Counter(0),
+    _HalfSecondBlink(false)
 {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
@@ -18,16 +22,21 @@ CRepeater::CRepeater() :
   _lastCD = _CD;
 
   //
-  // Configure I/O
+  // Setting I/O
   //
   pinMode(RX_LED, OUTPUT);
   pinMode(TX_LED, OUTPUT);
   pinMode(ANNONCE_BTN, INPUT_PULLUP);
   
   //
-  // Configure Slow Timer
+  // Setting Slow Timer
   //
-  _t.setInterval(CRepeater::OnTimerCB,1000);
+  _t1s.setInterval(CRepeater::OnTimer1SCB,1000);
+
+  //
+  // Setting Fast Timer
+  //
+  _t500ms.setInterval(CRepeater::OnTimer500msCB,500);
 
   Actions(IDLE);
   _log->Message("OK");
@@ -38,12 +47,48 @@ CRepeater::~CRepeater()
 
 }
 
-void CRepeater::OnTimerCB()
+void CRepeater::OnTimer500msCB()
 {
-  CRepeater::Create()->OnTimer();
+  CRepeater::Create()->OnTimer500ms();
 }
 
-void CRepeater::OnTimer()
+void CRepeater::OnTimer500ms()
+{
+  // Animate Green leds
+  // If Carriage Detect in IDLE mode , we blink
+  if (_etat==IDLE)
+  {
+    if (_CD && _etat==IDLE)
+    {
+      digitalWrite(RX_LED, _HalfSecondBlink);
+    }
+    else
+    {
+      digitalWrite(RX_LED, HIGH);
+    }
+    digitalWrite(TX_LED, LOW);
+  }
+  else
+  {
+    if (!_CD || _etat==ANNONCE_FIN)
+    {
+      digitalWrite(TX_LED, _HalfSecondBlink);
+    }
+    else
+    {
+      digitalWrite(TX_LED, HIGH);
+    }
+    digitalWrite(RX_LED, LOW);
+  }
+  _HalfSecondBlink = !_HalfSecondBlink;
+}
+
+void CRepeater::OnTimer1SCB()
+{
+  CRepeater::Create()->OnTimer1S();
+}
+
+void CRepeater::OnTimer1S()
 {
   //Grafcet
   switch (_etat)
@@ -79,7 +124,9 @@ void CRepeater::OnTimer()
     {
       if (! _CD) _counter ++;
       else _counter = 0;
-      if (_counter > 10)
+      _TOT_Counter++;
+
+      if ((_counter > 10) || (_TOT_Counter >= _TOT))
       {
         Actions(ANNONCE_FIN);
         _counter=0;
@@ -97,7 +144,13 @@ void CRepeater::OnTimer()
       break;
     }
   }
-  _log->Message("RSSI=" + String(_RSSI),true, CLog::DEBUG);
+  //Reset _antiBounce
+  if (_antiBounce > 0)
+  {
+    _antiBounce--;
+    if (_antiBounce==0) _audio->SetVolume(1,0.0);
+  }
+  _log->Message("RSSI=" + String(_RSSI) + "TOT Timer = " + String(_TOT_Counter),true, CLog::DEBUG);
 }
 
 void CRepeater::Actions(const Mode& pState)
@@ -108,8 +161,6 @@ void CRepeater::Actions(const Mode& pState)
     case IDLE:
     {
       _log->Message("IDLE");
-      digitalWrite(RX_LED, HIGH);
-      digitalWrite(TX_LED,LOW);
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,0.0);
       _audio->SetVolume(2,0.0);
@@ -118,8 +169,6 @@ void CRepeater::Actions(const Mode& pState)
     case ANNONCE_DEB:
     {
       _log->Message("Annonce début");
-      digitalWrite(RX_LED, LOW);
-      digitalWrite(TX_LED,HIGH);
       //mute input sound still playing welcome
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
@@ -130,18 +179,15 @@ void CRepeater::Actions(const Mode& pState)
     case REPEATER:
     {
       _log->Message("Repeater");
-      digitalWrite(RX_LED, LOW);
-      digitalWrite(TX_LED,HIGH);
       _audio->SetVolume(0,1.0);
       _audio->SetVolume(1,0.0);
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
+      _TOT_Counter = 0;
       break;
     }
     case ANNONCE_FIN:
     {
       _log->Message("Annonce Fin");
-      digitalWrite(RX_LED, LOW);
-      digitalWrite(TX_LED,HIGH);
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
@@ -167,7 +213,17 @@ void CRepeater::OnUpdate()
   if (_CD != _lastCD)
   {
     _lastCD = _CD;
-    if ((!_CD) && (_etat == REPEATER)) _audio->Play("beep.wav");
+    // If we loose carriage and we are in repeater mode, play RogerBeep
+    // _antiBouce is to avoid bounce CD detection
+    if ((!_CD) && (_etat == REPEATER) && (_antiBounce==0))
+    {
+      _audio->SetVolume(1,1.0);
+      _audio->Play("beep.wav");
+      _TOT_Counter = 0;
+      _antiBounce = 2;
+    }
   }
-  _t.handle();
+  _t1s.handle();
+  _t500ms.handle();
+
 }
