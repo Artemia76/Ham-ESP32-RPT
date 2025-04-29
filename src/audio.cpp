@@ -158,7 +158,7 @@ void CAudio::SetVolume(int pChannel, float pValue)
 void CAudio::Play(const String& pSound)
 {
   //_player.begin(pTrack);
-  _player.setPath(pSound.c_str());
+  _player.setPath(String("/wav/" + pSound).c_str());
   _player.setAutoNext(false);
 }
 
