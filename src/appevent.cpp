@@ -1,11 +1,11 @@
 /**
- * @file log.cpp
+ * @file appevent.cpp
  * @author Gianni Peschiutta (F4IKZ)
  * @brief HAM-ESP32-RPT
  * @version 0.1
- * @date 2025-02-13
+ * @date 2024-11-21
  * 
- * @copyright Copyright (c) 2025
+ * @copyright Copyright (c) 2024
  *
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -21,9 +21,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef AUDIOCONFIGLOCAL_H
-#define AUDIOCONFIGLOCAL_H
+ #include "app.hpp"
 
-#define DEFAULT_BUFFER_SIZE 1024
+ CAppEvent::CAppEvent ()
+ {
+    _app = CApp::Create();
+    _app->_subscribe(this);
+ }
 
-#endif //AUDIOCONFIGLOCAL_H
+ CAppEvent::~CAppEvent ()
+ {
+    _app->_unSubscribe(this);
+ }

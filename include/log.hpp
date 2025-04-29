@@ -1,5 +1,5 @@
 /**
- * @file log.cpp
+ * @file log.hpp
  * @author Gianni Peschiutta (F4IKZ)
  * @brief HAM-ESP32-RPT
  * @version 0.1
@@ -21,9 +21,49 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef AUDIOCONFIGLOCAL_H
-#define AUDIOCONFIGLOCAL_H
+#ifndef LOG_HPP
+#define LOG_HPP
 
-#define DEFAULT_BUFFER_SIZE 1024
+#include <Arduino.h>
+#include "singleton.hpp"
+#include <mutex>
 
-#endif //AUDIOCONFIGLOCAL_H
+class CLog : public CSingleTon<CLog>
+{
+    friend class CSingleTon <CLog>;
+public:
+    /**
+     * @brief Enumaration of critical level
+     * 
+     */
+     enum Level
+     {
+        NORMAL = 0,
+        WARNING,
+        ERROR,
+        DEBUG
+     };
+
+    /**
+     * @brief Send message to serial port
+     * 
+     * @param pMessage Message to display
+     * @param pCR Cariage Return if True
+     */
+    void Message(const String& pMessage, bool pCR=true, Level pLevel = NORMAL);
+
+
+    void SetLevel (Level pLevel);
+private:
+    CLog();
+    ~CLog();
+
+    /**
+     * @brief mutex to protect against concurent access
+     * 
+     */
+    std::mutex _mutex;
+
+    Level _level;
+};
+#endif
