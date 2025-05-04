@@ -179,7 +179,8 @@ void CRepeater::Actions(const Mode& pState)
     case REPEATER:
     {
       _log->Message("Repeater");
-      _audio->SetVolume(0,1.0);
+      if (_CD) _audio->SetVolume(0,1.0);
+      else _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,0.0);
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       _TOT_Counter = 0;
