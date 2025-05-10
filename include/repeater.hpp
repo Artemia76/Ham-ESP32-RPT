@@ -39,7 +39,7 @@
 #define ANNONCE_BTN 11
 #define PTT 12
 
-enum Mode
+enum Steps
 {
   IDLE,
   ANNONCE_DEB,
@@ -51,7 +51,7 @@ class CRepeater : public CSingleTon<CRepeater>, CAppEvent
 {
   friend class CSingleTon<CRepeater>;
 public:
-    void Actions (const Mode& pState);
+    void Actions (const Steps& pStep);
 
 protected:
 
@@ -78,11 +78,31 @@ protected:
   void OnUpdate();
 
   private:
+    /**
+     * @brief Construct a new CRepeater object
+     * 
+     */
     CRepeater ();
+
+    /**
+     * @brief Destroy the CRepeater object
+     * 
+     */
     ~CRepeater ();
 
-    Mode _etat;
-    Mode _lastEtat;
+    /**
+     * @brief Current step of repeater sequence
+     * 
+     */
+    Steps _step;
+
+    /**
+     * @brief Previous step of repeater sequence
+     * 
+     */
+    Steps _lastStep;
+
+
     std::atomic<bool> _switch;
 
     CLog* _log;

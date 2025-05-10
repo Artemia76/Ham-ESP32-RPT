@@ -24,13 +24,20 @@
 #ifndef CSINGLETON_HPP
 #define CSINGLETON_HPP
 
+/**
+ * @brief Singleton template 
+ * 
+ * @tparam T 
+ */
 template <class T> class CSingleTon
 {
 public :
 
-    //----------------------------------------------------------------
-    // Renvoie l'instance unique de la classe
-    //----------------------------------------------------------------
+    /**
+     * @brief Creat instance of singleton if not exist, and anyway , it return instance
+     * 
+     * @return T* 
+     */
     static	T*	Create()
     {
         if (!Inst)
@@ -39,9 +46,10 @@ public :
         return Inst;
     }
 
-    //----------------------------------------------------------------
-    // Détruit l'instance unique de la classe
-    //----------------------------------------------------------------
+    /**
+     * @brief Destruct the singleton instance if exist
+     * 
+     */
     static	void	Kill()
     {
         delete Inst;

@@ -27,7 +27,7 @@
 #include "log.hpp"
 #include "app.hpp"
 #include "singleton.hpp"
-#include "AudioConfigLocal.h"
+#include "AudioConfigLocal.hpp"
 #include <AudioTools.h>
 #include <AudioTools/AudioLibs/AudioRealFFT.h>
 #include <AudioTools/AudioLibs/AudioSourceSPIFFS.h>
@@ -50,21 +50,57 @@
 #define CTCSS_LVL 0.2
 
 /**
- * @brief 
- * 
+ * @brief CAudio class manage audio processing
+ * @details This class manage input and output audio for repeater
+ *          It also manage CTSS sine wave generation and 1750Hz detection
+ *          by using FFT
  */
-
 class CAudio : public CSingleTon<CAudio>, CAppEvent
 {
+    /**
+     * @brief Ensure this class is the only existing one on system
+     * 
+     */
     friend class CSingleTon <CAudio>;
 public:
 
+    /**
+     * @brief Analyse the FFT sampling. The target frequency is 1750Hz tone
+     * 
+     * @return true if 1750 Hz is detected as main frequency
+     * @return false if no 1750Hz with significative magnitude 
+     */
     bool Is1750Detected ();
+
+    /**
+     * @brief Get CCTCSS Status : CTCSS is a low frequency tone to trigger remote Radio Receiver
+     * 
+     * @return true : CTCSS running
+     * @return false : CTCSS disabled
+     */
     bool IsCTCSSEnabled();
+
+    /**
+     * @brief Set the Mixer Volume track
+     * 
+     * @param pChannel the track number
+     * @param pValue  the volume value (0.0 to 1.0)
+     */
     void SetVolume(int pChannel, float pValue);
+
+    /**
+     * @brief Play the wav sound in /wav folder on SD Memory 
+     * 
+     * @param pSound : the sound name
+     */
     void Play(const String& pSound);
 
 protected:
+
+    /**
+     * @brief Main loop callback from app
+     * 
+     */
     void OnUpdate();
 
 private:

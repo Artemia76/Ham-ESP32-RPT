@@ -64,6 +64,10 @@ private:
      */
     std::mutex _mutex;
 
+    /**
+     * @brief Level of debug message
+     * 
+     */
     Level _level;
 };
 #endif

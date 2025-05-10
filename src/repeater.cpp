@@ -1,8 +1,8 @@
 #include "repeater.hpp"
 
 CRepeater::CRepeater() :
-    _etat(IDLE),
-    _lastEtat(IDLE),
+    _step(IDLE),
+    _lastStep(IDLE),
     _counter(0),
     _lastState(HIGH),
     _currentState(HIGH),
@@ -56,9 +56,9 @@ void CRepeater::OnTimer500ms()
 {
   // Animate Green leds
   // If Carriage Detect in IDLE mode , we blink
-  if (_etat==IDLE)
+  if (_step==IDLE)
   {
-    if (_CD && _etat==IDLE)
+    if (_CD && _step==IDLE)
     {
       digitalWrite(RX_LED, _HalfSecondBlink);
     }
@@ -70,7 +70,7 @@ void CRepeater::OnTimer500ms()
   }
   else
   {
-    if (!_CD || _etat==ANNONCE_FIN)
+    if (!_CD || _step==ANNONCE_FIN)
     {
       digitalWrite(TX_LED, _HalfSecondBlink);
     }
@@ -91,7 +91,7 @@ void CRepeater::OnTimer1SCB()
 void CRepeater::OnTimer1S()
 {
   //Grafcet
-  switch (_etat)
+  switch (_step)
   {
     case IDLE:
     {
@@ -150,13 +150,13 @@ void CRepeater::OnTimer1S()
     _antiBounce--;
     if (_antiBounce==0) _audio->SetVolume(1,0.0);
   }
-  _log->Message("RSSI=" + String(_RSSI) + "TOT Timer = " + String(_TOT_Counter),true, CLog::DEBUG);
+  _log->Message("RSSI=" + String(_RSSI) + " TOT Timer = " + String(_TOT_Counter),true, CLog::DEBUG);
 }
 
-void CRepeater::Actions(const Mode& pState)
+void CRepeater::Actions(const Steps& pStep)
 {
   if (!_switch) return;
-  switch (pState)
+  switch (pStep)
   {
     case IDLE:
     {
@@ -196,7 +196,7 @@ void CRepeater::Actions(const Mode& pState)
       break;
     }
   }
-  _etat = pState;
+  _step = pStep;
 }
 
 void CRepeater::OnUpdate()
@@ -216,7 +216,7 @@ void CRepeater::OnUpdate()
     _lastCD = _CD;
     // If we loose carriage and we are in repeater mode, play RogerBeep
     // _antiBouce is to avoid bounce CD detection
-    if ((!_CD) && (_etat == REPEATER) && (_antiBounce==0))
+    if ((!_CD) && (_step == REPEATER) && (_antiBounce==0))
     {
       _audio->SetVolume(1,1.0);
       _audio->Play("beep.wav");

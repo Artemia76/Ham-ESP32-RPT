@@ -45,7 +45,7 @@ class CWebServerEvent
 {
 friend class CWebServer;
 public:
- /**
+    /**
      * @brief Construct a new CWebServerEvent object
      * 
      * @param pWebServer 
