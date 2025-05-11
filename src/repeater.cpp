@@ -113,7 +113,7 @@ void CRepeater::OnTimer1S()
     case ANNONCE_DEB:
     {
       _counter++;
-      if (_counter > 3)
+      if (_counter > 2)
       {
         Actions(REPEATER);
         _counter=0;
@@ -164,6 +164,7 @@ void CRepeater::Actions(const Steps& pStep)
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,0.0);
       _audio->SetVolume(2,0.0);
+      digitalWrite(PTT,HIGH);
       break;
     }
     case ANNONCE_DEB:
@@ -174,6 +175,7 @@ void CRepeater::Actions(const Steps& pStep)
       _audio->SetVolume(1,1.0);
       if ( _audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       _audio->Play("welcome.wav");
+      digitalWrite(PTT,LOW);
       break;
     }
     case REPEATER:
@@ -213,16 +215,27 @@ void CRepeater::OnUpdate()
   _CD = (_RSSI > _CD_Threshold);
   if (_CD != _lastCD)
   {
-    _lastCD = _CD;
-    // If we loose carriage and we are in repeater mode, play RogerBeep
-    // _antiBouce is to avoid bounce CD detection
-    if ((!_CD) && (_step == REPEATER) && (_antiBounce==0))
+    if (_step == REPEATER)
     {
-      _audio->SetVolume(1,1.0);
-      _audio->Play("beep.wav");
-      _TOT_Counter = 0;
-      _antiBounce = 2;
+      if (!_CD)
+      {
+        _audio->SetVolume(0,0.0);
+      }
+      else
+      {
+        _audio->SetVolume(0,1.0);
+      }
+      // If we loose carriage and we are in repeater mode, play RogerBeep
+    // _antiBouce is to avoid bounce CD detection
+      if ((!_CD) && (_antiBounce==0))
+      {
+        _audio->SetVolume(1,1.0);
+        _audio->Play("beep.wav");
+        _TOT_Counter = 0;
+        _antiBounce = 2;
+      } 
     }
+    _lastCD = _CD;
   }
   _t1s.handle();
   _t500ms.handle();
