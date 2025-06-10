@@ -27,6 +27,7 @@ CRepeater::CRepeater() :
   pinMode(RX_LED, OUTPUT);
   pinMode(TX_LED, OUTPUT);
   pinMode(ANNONCE_BTN, INPUT_PULLUP);
+  pinMode(PTT, OUTPUT);
   
   //
   // Setting Slow Timer
@@ -164,7 +165,7 @@ void CRepeater::Actions(const Steps& pStep)
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,0.0);
       _audio->SetVolume(2,0.0);
-      digitalWrite(PTT,HIGH);
+      digitalWrite(PTT,LOW);
       break;
     }
     case ANNONCE_DEB:
@@ -175,7 +176,7 @@ void CRepeater::Actions(const Steps& pStep)
       _audio->SetVolume(1,1.0);
       if ( _audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       _audio->Play("welcome.wav");
-      digitalWrite(PTT,LOW);
+      digitalWrite(PTT,HIGH);
       break;
     }
     case REPEATER:
