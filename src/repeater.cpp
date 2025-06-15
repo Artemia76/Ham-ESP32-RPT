@@ -104,7 +104,7 @@ void CRepeater::OnTimer1S()
       {
         _counter = 0;
       }
-      if (_counter >= 2)
+      if (_counter >= 1)
       {
         Actions(ANNONCE_DEB);
         _counter=0;
