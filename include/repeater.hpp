@@ -31,13 +31,18 @@
 
 #include <AsyncTimer.h>
 #include <atomic>
+#include <Wire.h>
+#include "Adafruit_INA219.h"
 
 // I/O PINs
-#define RSSI 8
-#define RX_LED 10
-#define TX_LED 9
+#define RSSI 13
+#define RX_LED 15
+#define TX_LED 14
 #define ANNONCE_BTN 11
 #define PTT 12
+//Set pins for I2C1
+#define I2C1_SDA_PIN 8
+#define I2C1_SCL_PIN 9
 
 enum Steps
 {
@@ -110,16 +115,18 @@ protected:
     uint8_t _counter;
     AsyncTimer _t1s;
     AsyncTimer _t500ms;
+    Adafruit_INA219 _ina219;
     int _lastState;
     int _currentState;
-    int _RSSI;
+    float _RSSI;
     int _TOT;
     int _TOT_Counter;
     bool _lastCD;
     bool _CD;
     int _antiBounce;
-    int _CD_Threshold; //RSSI threshold(Squelch)
+    float _CD_Threshold; //RSSI threshold(Squelch)
     bool _HalfSecondBlink;
+    TwoWire _i2c;
     static void OnTimer1SCB ();
     static void OnTimer500msCB ();
     void OnTimer1S ();

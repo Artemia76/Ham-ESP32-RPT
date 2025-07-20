@@ -7,18 +7,18 @@ CRepeater::CRepeater() :
     _lastState(HIGH),
     _currentState(HIGH),
     _switch(true),
-    _CD_Threshold(3000),
+    _CD_Threshold(1.215),
     _CD(false),
     _antiBounce(0),
     _TOT(180),
     _TOT_Counter(0),
-    _HalfSecondBlink(false)
+    _HalfSecondBlink(false),
+    _i2c(0x40)
 {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
 
   _audio = CAudio::Create();
-  _RSSI = analogRead(RSSI);
   _lastCD = _CD;
 
   //
@@ -29,6 +29,15 @@ CRepeater::CRepeater() :
   pinMode(ANNONCE_BTN, INPUT_PULLUP);
   pinMode(PTT, OUTPUT);
   
+  _i2c.setPins(I2C1_SDA_PIN,I2C1_SCL_PIN);
+  // Initialize the INA219.
+  // By default the initialization will use the largest range (32V, 2A).  However
+  // you can call a setCalibration function to change this range (see comments).
+  if (! _ina219.begin(&_i2c))
+  {
+    _log->Message("Failed to find INA219 chip");
+  }
+  _RSSI = _ina219.getBusVoltage_V();
   //
   // Setting Slow Timer
   //
@@ -175,7 +184,7 @@ void CRepeater::Actions(const Steps& pStep)
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
       if ( _audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
-      _audio->Play("welcome.wav");
+      _audio->Play("louise2.wav");
       digitalWrite(PTT,HIGH);
       break;
     }
@@ -211,7 +220,7 @@ void CRepeater::OnUpdate()
   }
   _lastState = _currentState;
   // Read RSSI and if threshold, play a K
-  _RSSI = analogRead(RSSI);
+  _RSSI = _ina219.getBusVoltage_V();
 
   _CD = (_RSSI > _CD_Threshold);
   if (_CD != _lastCD)
