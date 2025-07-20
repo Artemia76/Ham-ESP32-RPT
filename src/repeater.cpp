@@ -12,9 +12,8 @@ CRepeater::CRepeater() :
     _antiBounce(0),
     _TOT(180),
     _TOT_Counter(0),
-    _HalfSecondBlink(false),
-    _i2c(0x40)
-{
+    _HalfSecondBlink(false)
+  {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
 
@@ -29,11 +28,11 @@ CRepeater::CRepeater() :
   pinMode(ANNONCE_BTN, INPUT_PULLUP);
   pinMode(PTT, OUTPUT);
   
-  _i2c.setPins(I2C1_SDA_PIN,I2C1_SCL_PIN);
+
   // Initialize the INA219.
   // By default the initialization will use the largest range (32V, 2A).  However
   // you can call a setCalibration function to change this range (see comments).
-  if (! _ina219.begin(&_i2c))
+  if (! _ina219.begin())
   {
     _log->Message("Failed to find INA219 chip");
   }
