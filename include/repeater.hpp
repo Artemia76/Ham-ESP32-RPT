@@ -126,7 +126,6 @@ protected:
     int _antiBounce;
     float _CD_Threshold; //RSSI threshold(Squelch)
     bool _HalfSecondBlink;
-    TwoWire _i2c;
     static void OnTimer1SCB ();
     static void OnTimer500msCB ();
     void OnTimer1S ();
