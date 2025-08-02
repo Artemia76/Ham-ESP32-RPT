@@ -35,14 +35,10 @@
 #include "Adafruit_INA219.h"
 
 // I/O PINs
-#define RSSI 13
 #define RX_LED 15
 #define TX_LED 14
 #define ANNONCE_BTN 11
 #define PTT 12
-//Set pins for I2C1
-#define I2C1_SDA_PIN 8
-#define I2C1_SCL_PIN 9
 
 enum Steps
 {
