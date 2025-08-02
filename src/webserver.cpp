@@ -216,10 +216,14 @@ void CWebServer::_onGetRSSI (AsyncWebServerRequest *request)
         if (Subcriber != nullptr)
         {
             Value= Subcriber->onGET("RSSI");
+            if (!Value.isEmpty())
+            {
+                request->send(200,"text/plain", Value); 
+                _log->Message ("Received Get RSSI = " + Value, true, CLog::Level::DEBUG);
+                return;
+            }
         }
     }
-    request->send(200,"text/plain", Value);
-    _log->Message ("Received Get RSSI = " + Value, true, CLog::Level::DEBUG);
 }
 
 /*****************************************************************************/
