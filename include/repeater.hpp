@@ -28,6 +28,7 @@
 #include "app.hpp"
 #include "singleton.hpp"
 #include "audio.hpp"
+#include "webserver.hpp"
 
 #include <AsyncTimer.h>
 #include <atomic>
@@ -48,7 +49,7 @@ enum Steps
   ANNONCE_FIN
 };
 
-class CRepeater : public CSingleTon<CRepeater>, CAppEvent
+class CRepeater : public CSingleTon<CRepeater>, CAppEvent, CWebServerEvent
 {
   friend class CSingleTon<CRepeater>;
 public:
@@ -119,6 +120,7 @@ protected:
     int _TOT_Counter;
     bool _lastCD;
     bool _CD;
+    bool _enabled;
     int _antiBounce;
     float _CD_Threshold; //RSSI threshold(Squelch)
     bool _HalfSecondBlink;
