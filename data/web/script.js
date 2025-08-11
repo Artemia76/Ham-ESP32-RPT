@@ -23,7 +23,7 @@ setInterval(function getData()
         }
     };
 
-    xhttp.open("GET","lireLuminosite", true);
+    xhttp.open("GET","getRSSI", true);
     xhttp.send();
 }, 2000);
 
