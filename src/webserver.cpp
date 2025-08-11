@@ -99,16 +99,20 @@ CWebServer::CWebServer () :
         request->send(SPIFFS, "/web/w3.css", "text/css");
     });
 
+    _server.on("/custom.css",HTTP_GET, [](AsyncWebServerRequest *request)
+    {
+        request->send(SPIFFS, "/web/custom.css", "text/javascript");
+    });
+
     _server.on("/script.js",HTTP_GET, [](AsyncWebServerRequest *request)
     {
         request->send(SPIFFS, "/web/script.js", "text/javascript");
     });
 
-    _server.on("/lireLuminosite",HTTP_GET, [this](AsyncWebServerRequest *request)
+    _server.on("/getRSSI",HTTP_GET, [this](AsyncWebServerRequest *request)
     {
         this->_onGetRSSI (request);
     });
-    
 
     _server.on("/RepOn",HTTP_GET, [this](AsyncWebServerRequest *request)
     {
@@ -216,10 +220,14 @@ void CWebServer::_onGetRSSI (AsyncWebServerRequest *request)
         if (Subcriber != nullptr)
         {
             Value= Subcriber->onGET("RSSI");
+            if (!Value.isEmpty())
+            {
+                request->send(200,"text/plain", Value); 
+                _log->Message ("Received Get RSSI = " + Value, true, CLog::Level::DEBUG);
+                return;
+            }
         }
     }
-    request->send(200,"text/plain", Value);
-    _log->Message ("Received lireLuminosite = " + Value, true, CLog::Level::DEBUG);
 }
 
 /*****************************************************************************/

@@ -41,7 +41,8 @@ public:
         NORMAL = 0,
         WARNING,
         ERROR,
-        DEBUG
+        DEBUG,
+        VERBOSE
      };
 
     /**

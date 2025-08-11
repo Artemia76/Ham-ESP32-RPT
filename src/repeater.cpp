@@ -30,13 +30,14 @@ CRepeater::CRepeater() :
     _lastState(HIGH),
     _currentState(HIGH),
     _switch(true),
-    _CD_Threshold(1.215),
+    _CD_Threshold(1.75),
     _CD(false),
     _antiBounce(0),
     _TOT(180),
     _TOT_Counter(0),
-    _HalfSecondBlink(false)
-  {
+    _HalfSecondBlink(false),
+    _enabled(true)
+{
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
 
@@ -51,7 +52,6 @@ CRepeater::CRepeater() :
   pinMode(ANNONCE_BTN, INPUT_PULLUP);
   pinMode(PTT, OUTPUT);
   
-
   // Initialize the INA219.
   // By default the initialization will use the largest range (32V, 2A).  However
   // you can call a setCalibration function to change this range (see comments).
@@ -122,6 +122,7 @@ void CRepeater::OnTimer1SCB()
 
 void CRepeater::OnTimer1S()
 {
+  if (!_enabled) return;
   //Grafcet
   switch (_step)
   {
@@ -235,41 +236,69 @@ void CRepeater::Actions(const Steps& pStep)
 
 void CRepeater::OnUpdate()
 {
-  _currentState = digitalRead(ANNONCE_BTN);
-  if (_lastState == LOW && _currentState == HIGH)
+  if (_enabled)
   {
-    Actions(ANNONCE_DEB);
-  }
-  _lastState = _currentState;
-  // Read RSSI and if threshold, play a K
-  _RSSI = _ina219.getBusVoltage_V();
-
-  _CD = (_RSSI > _CD_Threshold);
-  if (_CD != _lastCD)
-  {
-    if (_step == REPEATER)
+    _currentState = digitalRead(ANNONCE_BTN);
+    if (_lastState == LOW && _currentState == HIGH)
     {
-      if (!_CD)
-      {
-        _audio->SetVolume(0,0.0);
-      }
-      else
-      {
-        _audio->SetVolume(0,1.0);
-      }
-      // If we loose carriage and we are in repeater mode, play RogerBeep
-    // _antiBouce is to avoid bounce CD detection
-      if ((!_CD) && (_antiBounce==0))
-      {
-        _audio->SetVolume(1,1.0);
-        _audio->Play("beep.wav");
-        _TOT_Counter = 0;
-        _antiBounce = 2;
-      } 
+      Actions(ANNONCE_DEB);
     }
-    _lastCD = _CD;
+    _lastState = _currentState;
+    // Read RSSI and if threshold, play a K
+    _RSSI = _ina219.getBusVoltage_V();
+
+    _CD = (_RSSI > _CD_Threshold);
+    if (_CD != _lastCD)
+    {
+      if (_step == REPEATER)
+      {
+        if (!_CD)
+        {
+          _audio->SetVolume(0,0.0);
+        }
+        else
+        {
+          _audio->SetVolume(0,1.0);
+        }
+        // If we loose carriage and we are in repeater mode, play RogerBeep
+        // _antiBouce is to avoid bounce CD detection
+        if ((!_CD) && (_antiBounce==0))
+        {
+          _audio->SetVolume(1,1.0);
+          _audio->Play("beep.wav");
+          _TOT_Counter = 0;
+          _antiBounce = 2;
+        } 
+      }
+      _lastCD = _CD;
+    }
   }
   _t1s.handle();
   _t500ms.handle();
+
+}
+
+String CRepeater::onGET(const String& pCommand)
+{
+  if (pCommand == "RSSI")
+  {
+    return String(_RSSI);
+  }
+  else if (pCommand == "RepOff")
+  {
+    _enabled =false;
+    Actions(IDLE);
+    return "OK";
+  }
+  else if (pCommand == "RepOn")
+  {
+    _enabled =true;
+    return "OK";
+  }
+  else return "";
+}
+
+void CRepeater::onPOST(const String& pCommand, const String& pData)
+{
 
 }
