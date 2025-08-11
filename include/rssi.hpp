@@ -67,7 +67,7 @@ public:
      * 
      * @return std::map<float, RSSIData> Map of RSSI data
      */
-    std::map<float, RSSIData> getRSSIData() const;
+    std::map<float, RSSIData> getRSSIData();
     /**
      * @brief Clear all RSSI data
      * 
@@ -78,7 +78,7 @@ public:
      * 
      * @return true if save was successful, false otherwise
      */
-    bool saveRSSIDataToSPIFFS() const;
+    bool saveRSSIDataToSPIFFS();
     /**
      * @brief Load RSSI data from SPIFFS
      * 

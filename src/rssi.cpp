@@ -41,9 +41,9 @@ void CRSSI::addRSSIData(const RSSIData& pRSSI)
     _log->Message("Added RSSI data: V=" + String(pRSSI.V) + ", dBm=" + String(pRSSI.dBm) + ", S=" + String(pRSSI.S), true, CLog::Level::DEBUG);
 }
 
-std::map<float, RSSIData> CRSSI::getRSSIData() const
+std::map<float, RSSIData> CRSSI::getRSSIData()
 {
-    std::lock_guard<std::mutex> lock(_mutex);
+    const std::lock_guard<std::mutex> lock(_mutex);
     return _rssiData;
 }
 
@@ -55,7 +55,7 @@ void CRSSI::clearRSSIData()
     _log->Message("Cleared all RSSI data", true, CLog::Level::DEBUG);
 }
 
-bool CRSSI::saveRSSIDataToSPIFFS() const
+bool CRSSI::saveRSSIDataToSPIFFS()
 {
     std::lock_guard<std::mutex> lock(_mutex);
     File file = SPIFFS.open("/rssi_data.json", "w");
@@ -64,9 +64,9 @@ bool CRSSI::saveRSSIDataToSPIFFS() const
         return false;
     }
 
-    DynamicJsonDocument doc(1024);
+    JsonDocument doc;
     for (const auto& entry : _rssiData) {
-        JsonObject obj = doc.createNestedObject();
+        JsonObject obj = doc.add<JsonObject>();
         obj["dBm"] = entry.first;
         obj["V"] = entry.second.V;
         obj["S"] = entry.second.S;
@@ -84,14 +84,14 @@ bool CRSSI::saveRSSIDataToSPIFFS() const
 
 bool CRSSI::loadRSSIDataFromSPIFFS()
 {
-    std::lock_guard<std::mutex> lock(_mutex);
+    const std::lock_guard<std::mutex> lock(_mutex);
     File file = SPIFFS.open("/rssi_data.json", "r");
     if (!file) {
         _log->Message("Failed to open file for reading", true, CLog::Level::ERROR);
         return false;
     }
 
-    DynamicJsonDocument doc(1024);
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, file);
     if (error) {
         _log->Message("Failed to parse RSSI data from file: " + String(error.c_str()), true, CLog::Level::ERROR);
