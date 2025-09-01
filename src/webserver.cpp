@@ -87,6 +87,7 @@ CWebServer::CWebServer () :
     _log->Message ("WiFi connected.");
     _log->Message ("IP address: ");
     _log->Message (WiFi.localIP().toString());
+    _log->Message ("Wifi Channel: " + String(WiFi.channel()));
 
     //--------------------------------------------SERVER
     _server.on("/",HTTP_GET, [](AsyncWebServerRequest *request)
@@ -139,6 +140,12 @@ CWebServer::CWebServer () :
         this->_onGetSet (request);
     });
     _server.begin();
+
+    //
+    // Setting Slow Timer
+    //
+    _t1s.setInterval(CWebServer::OnTimer1SCB,1000);
+
     _initialized = true;
     _log->Message ("Server Online.");
 }
@@ -266,4 +273,19 @@ void CWebServer::_subscribe(CWebServerEvent* pSubscriber)
 void CWebServer::_unSubscribe(CWebServerEvent* pSubscriber)
 {
     _subscribers.erase(std::remove(_subscribers.begin(), _subscribers.end(), pSubscriber), _subscribers.end());
+}
+
+void CWebServer::OnTimer1SCB()
+{
+  CWebServer::Create()->OnTimer1S();
+}
+
+void CWebServer::OnTimer1S()
+{
+    _log->Message("Wifi RSSI = " + String(WiFi.RSSI()));
+}
+
+void CWebServer::OnUpdate()
+{
+    _t1s.handle();
 }

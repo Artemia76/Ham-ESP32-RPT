@@ -13,7 +13,8 @@ CRepeater::CRepeater() :
     _TOT(180),
     _TOT_Counter(0),
     _HalfSecondBlink(false),
-    _enabled(true)
+    _enabled(true),
+    _squelch(9)
 {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
@@ -160,7 +161,7 @@ void CRepeater::OnTimer1S()
     _antiBounce--;
     if (_antiBounce==0) _audio->SetVolume(1,0.0);
   }
-  _log->Message("RSSI=" + String(_RSSI) + " TOT Timer = " + String(_TOT_Counter),true, CLog::DEBUG);
+  //_log->Message("RSSI=" + String(_RSSI) + " TOT Timer = " + String(_TOT_Counter),true, CLog::DEBUG);
 }
 
 void CRepeater::Actions(const Steps& pStep)
@@ -271,6 +272,13 @@ String CRepeater::onGET(const String& pCommand)
   {
     _enabled =true;
     return "OK";
+  }
+  else if (pCommand == "Init")
+  {
+    Json json;
+    json.add("state", _enabled);
+    json.add("squelch", _squelch);
+    return json.toString();
   }
   else return "";
 }

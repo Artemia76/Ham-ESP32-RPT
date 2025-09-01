@@ -1,5 +1,11 @@
 'use strict';
 
+window.onload = (event) => {
+  var RepControl =  document.getElementById('RepControl');
+
+  console.log("page is fully loaded");
+};
+
 var RepControl = document.getElementById('RepControl');
 
 RepControl.addEventListener('change', function(){
@@ -27,5 +33,3 @@ setInterval(function getData()
     xhttp.send();
 }, 2000);
 
-
-    
