@@ -49,34 +49,9 @@
           <h2>SQUELCH LEVEL</h2>
         </div>
         <div class="w3-twothird">
-          <p>
-            <input class="w3-radio" type="radio" name="squelchvar" value="1" checked>
-            <label>1</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="2">
-            <label>2</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="3">
-            <label>3</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="4">
-            <label>4</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="5">
-            <label>5</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="6">
-            <label>6</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="7">
-            <label>7</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="8">
-            <label>8</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="9">
-            <label>9</label>
-          </p>
-          <p>
-            <input class="w3-radio" type="radio" name="squelchvar" value="10">
-            <label>9+10</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="11">
-            <label>9+20</label>
-            <input class="w3-radio" type="radio" name="squelchvar" value="12">
-            <label>9+30</label>
-          </p>
+          <input type="range" min="1" max="13" value="9" class="slider2" id="sql">
+          <p>Value:
+            <span id="sql_value"></span></p>
         </div>
       </div>
     </div>

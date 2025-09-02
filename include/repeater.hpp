@@ -25,16 +25,16 @@
 #define LOGIC_HPP
 
 #include "log.hpp"
-#include "app.hpp"
+#include "appevent.hpp"
 #include "singleton.hpp"
 #include "audio.hpp"
-#include "webserver.hpp"
 #include "rssi.hpp"
-
+#include "webserverevent.hpp"
 #include <AsyncTimer.h>
 #include <atomic>
 #include <Wire.h>
 #include "Adafruit_INA219.h"
+#include "Json.h"
 
 // I/O PINs
 #define RX_LED 15
@@ -124,6 +124,7 @@ protected:
     bool _enabled;
     int _antiBounce;
     float _CD_Threshold; //RSSI threshold(Squelch)
+    int _squelch;
     bool _HalfSecondBlink;
     CRSSI _rssi2signal;
 

@@ -28,54 +28,14 @@
 #include <SPIFFS.h>
 #include <vector>
 #include <regex>
+#include <AsyncTimer.h>
 
+#include "appevent.hpp"
+#include "webserverevent.hpp"
 #include "env.hpp"
 #include "log.hpp"
 #include "singleton.hpp"
 
-// Use atomic to share async mutlithreaded 
-
-class CWebServer;
-
-/**
- * @brief Abstract class for process callback
- * 
- */
-class CWebServerEvent
-{
-friend class CWebServer;
-public:
-    /**
-     * @brief Construct a new CWebServerEvent object
-     * 
-     * @param pWebServer 
-     */
-    CWebServerEvent();
-
-    /**
-     * @brief Destroy the CWebServerEvent object
-     * 
-     */
-    ~CWebServerEvent();
-
-protected:
-
-virtual String onGET(const String& pCommand)=0;
-
-    /**
-     * @brief Process HTTP GET CommandEvent Callback
-     * 
-     * @param pCommand // #define DEBUG
-     */
-virtual void onPOST(const String& pCommand, const String& pData)=0;
-
-private:
-    /**
-     * @brief Store event controller
-     * 
-     */
-    CWebServer*  _webServer;
-};
 
 /**
  * @brief Container for event clients
@@ -88,10 +48,10 @@ typedef std::vector<CWebServerEvent*> v_WebServerSubscribers;
  * 
  * 
  */
-class CWebServer : public CSingleTon<CWebServer>
+class CWebServer : public CSingleTon<CWebServer>, CAppEvent
 {
-friend class CWebServerEvent;
-friend class CSingleTon<CWebServer>;
+    friend class CWebServerEvent;
+    friend class CSingleTon<CWebServer>;
 public:
 
 
@@ -102,6 +62,11 @@ protected:
     void _onGetCTCSSOff (AsyncWebServerRequest *request);
     void _onGetRSSI (AsyncWebServerRequest *request);
     void _onGetSet (AsyncWebServerRequest *request);
+    /**
+    * @brief Background Update event 
+    * 
+    */
+    void OnUpdate();
 
 private:
 
@@ -129,6 +94,8 @@ private:
      */
     AsyncWebServer _server;
 
+    AsyncTimer _t1s;
+
     /**
      * @brief Log Controller
      * 
@@ -138,7 +105,6 @@ private:
     // Wifi credential
     const char* _ssid;
     const char* _password;
-
 
     // Init State
     bool _initialized;
@@ -155,6 +121,8 @@ private:
      * @param pSubscriber 
      */
     void _unSubscribe (CWebServerEvent* pSubscriber);
+    void OnTimer1S ();
+    static void OnTimer1SCB ();
 };
 
 #endif
