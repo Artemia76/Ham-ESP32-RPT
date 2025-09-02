@@ -58,7 +58,7 @@ void CRSSI::clearRSSIData()
 bool CRSSI::saveRSSIDataToSPIFFS()
 {
     std::lock_guard<std::mutex> lock(_mutex);
-    File file = SPIFFS.open("/rssi_data.json", "w");
+    File file = SPIFFS.open("/conf/rssi_data.json", "w");
     if (!file) {
         _log->Message("Failed to open file for writing", true, CLog::Level::ERROR);
         return false;
@@ -85,7 +85,7 @@ bool CRSSI::saveRSSIDataToSPIFFS()
 bool CRSSI::loadRSSIDataFromSPIFFS()
 {
     const std::lock_guard<std::mutex> lock(_mutex);
-    File file = SPIFFS.open("/rssi_data.json", "r");
+    File file = SPIFFS.open("/conf/rssi_data.json", "r");
     if (!file) {
         _log->Message("Failed to open file for reading", true, CLog::Level::ERROR);
         return false;

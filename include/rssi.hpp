@@ -30,7 +30,7 @@
 #include <map>
 #include <algorithm>
 #include <SPIFFS.h>
-#include <ArduinoJson.h>
+#include <Json.h>
 
 struct RSSIData
 {
