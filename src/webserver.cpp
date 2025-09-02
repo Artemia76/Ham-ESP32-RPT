@@ -22,25 +22,7 @@
  */
 
 #include <algorithm>
-#include <Arduino.h>
 #include "webserver.hpp"
-
-/*****************************************************************************/
-
-CWebServerEvent::CWebServerEvent()
-{
-    _webServer = CWebServer::Create();
-    _webServer->_subscribe(this);
-}
-
-/*****************************************************************************/
-
-CWebServerEvent::~CWebServerEvent()
-{
-    _webServer->_unSubscribe(this);
-}
-
-/*****************************************************************************/
 
 CWebServer::CWebServer () :
     _server (80),
@@ -85,8 +67,7 @@ CWebServer::CWebServer () :
     // Print local IP address and start web server
     _log->Message ("\n");
     _log->Message ("WiFi connected.");
-    _log->Message ("IP address: ");
-    _log->Message (WiFi.localIP().toString());
+    _log->Message ("IP address: " + WiFi.localIP().toString());
     _log->Message ("Wifi Channel: " + String(WiFi.channel()));
 
     //--------------------------------------------SERVER
@@ -282,7 +263,7 @@ void CWebServer::OnTimer1SCB()
 
 void CWebServer::OnTimer1S()
 {
-    _log->Message("Wifi RSSI = " + String(WiFi.RSSI()));
+    _log->Message("Wifi RSSI = " + String(WiFi.RSSI()),CLog::VERBOSE);
 }
 
 void CWebServer::OnUpdate()

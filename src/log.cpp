@@ -32,14 +32,15 @@ CLog::CLog ()
     //while(!Serial){} // Wait until serial monitor is online
     Message ("Starting logging... ", false);
 
-#if defined (VERBOSE)
+#if defined(LOG_VERBOSE)
     _level = VERBOSE;
-#elif defined (DBG)
+
+#elif defined(LOG_DBG)
     _level = DEBUG;
 #else
     _level = NORMAL;
 #endif
-    Message ("OK");
+    Message ("OK, Log Level = " + String(_level));
 }
 
 /*****************************************************************************/
@@ -66,6 +67,13 @@ void CLog::Message (const String& pMessage, bool pCR, Level pLevel)
             Serial.print(pMessage);
         }
     }
+}
+
+/*****************************************************************************/
+
+void CLog::Message (const String& pMessage, Level pLevel)
+{
+    Message(pMessage, true, pLevel);
 }
 
 /*****************************************************************************/

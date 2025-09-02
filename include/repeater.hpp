@@ -34,7 +34,6 @@
 #include <atomic>
 #include <Wire.h>
 #include "Adafruit_INA219.h"
-#include "Json.h"
 
 // I/O PINs
 #define RX_LED 15

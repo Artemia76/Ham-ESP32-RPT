@@ -22,6 +22,7 @@
  */
 
 #include "repeater.hpp"
+#include <ArduinoJson.h>
 
 CRepeater::CRepeater() :
     _step(IDLE),
@@ -60,7 +61,10 @@ CRepeater::CRepeater() :
   {
     _log->Message("Failed to find INA219 chip");
   }
-  _RSSI = _ina219.getBusVoltage_V();
+  else
+  {
+    _RSSI = _ina219.getBusVoltage_V();
+  }
   //
   // Setting Slow Timer
   //
@@ -184,7 +188,7 @@ void CRepeater::OnTimer1S()
     _antiBounce--;
     if (_antiBounce==0) _audio->SetVolume(1,0.0);
   }
-  //_log->Message("RSSI=" + String(_RSSI) + " TOT Timer = " + String(_TOT_Counter),true, CLog::DEBUG);
+  _log->Message("RSSI=" + String(_RSSI) + " TOT Timer = " + String(_TOT_Counter),true, CLog::VERBOSE);
 }
 
 void CRepeater::Actions(const Steps& pStep)
@@ -246,7 +250,8 @@ void CRepeater::OnUpdate()
     }
     _lastState = _currentState;
     // Read RSSI and if threshold, play a K
-    _RSSI = _ina219.getBusVoltage_V();
+    if (_ina219.success())
+      _RSSI = _ina219.getBusVoltage_V();
 
     _CD = (_RSSI > _CD_Threshold);
     if (_CD != _lastCD)
@@ -281,29 +286,31 @@ void CRepeater::OnUpdate()
 
 String CRepeater::onGET(const String& pCommand)
 {
+  String Result = "";
   if (pCommand == "RSSI")
   {
-    return String(_RSSI);
+    Result = String(_RSSI);
   }
   else if (pCommand == "RepOff")
   {
     _enabled =false;
     Actions(IDLE);
-    return "OK";
+    Result = "OK";
   }
   else if (pCommand == "RepOn")
   {
     _enabled =true;
-    return "OK";
+    Result = "OK";
   }
   else if (pCommand == "Init")
   {
-    Json json;
-    json.add("state", _enabled);
-    json.add("squelch", _squelch);
-    return json.toString();
+    JsonDocument json;
+    json["state"] =  _enabled;
+    json["squelch"] = _squelch;
+    json["tot"] = _TOT;
+    serializeJson(json, Result);
   }
-  else return "";
+  return Result;
 }
 
 void CRepeater::onPOST(const String& pCommand, const String& pData)

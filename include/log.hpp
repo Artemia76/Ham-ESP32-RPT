@@ -51,8 +51,8 @@ public:
      * @param pMessage Message to display
      * @param pCR Cariage Return if True
      */
-    void Message(const String& pMessage, bool pCR=true, Level pLevel = NORMAL);
-
+    void Message(const String& pMessage, bool pCR, Level pLevel = NORMAL);
+    void Message(const String& pMessage, Level pLevel = NORMAL);
 
     void SetLevel (Level pLevel);
 private:
