@@ -24,15 +24,17 @@
 #ifndef AUDIO_HPP
 #define AUDIO_HPP
 
+#include <AudioTools.h>
+#include <AudioTools/AudioLibs/AudioRealFFT.h>
+#include <AudioTools/AudioLibs/AudioSourceLittleFS.h>
+#include <map>
+#include <CircularBuffer.hpp>
+
 #include "log.hpp"
 #include "app.hpp"
 #include "singleton.hpp"
 #include "AudioConfigLocal.hpp"
-#include <AudioTools.h>
-#include <AudioTools/AudioLibs/AudioRealFFT.h>
-#include <AudioTools/AudioLibs/AudioSourceSPIFFS.h>
-#include <map>
-#include <CircularBuffer.hpp>
+
 
 // A/D Converter PINs
 #define AD_MCLK 0
@@ -121,7 +123,7 @@ private:
     MultiOutput _multiOutput;
     CircularBuffer <AudioFFTResult,10> _FFTBuf;
     WAVDecoder _decoder;
-    AudioSourceSPIFFS _source;
+    AudioSourceLittleFS _source;
     AudioPlayer _player;
     StreamCopy _inCopier;
     StreamCopy _ctcss_copier;

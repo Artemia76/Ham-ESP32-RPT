@@ -24,15 +24,17 @@
 #ifndef LOGIC_HPP
 #define LOGIC_HPP
 
+//#include <Wire.h>
+#include <atomic>
+#include <AsyncTimer.h>
+#include <Preferences.h>
+
 #include "log.hpp"
 #include "appevent.hpp"
 #include "singleton.hpp"
 #include "audio.hpp"
 #include "rssi.hpp"
 #include "webserverevent.hpp"
-#include <AsyncTimer.h>
-#include <atomic>
-#include <Wire.h>
 #include "Adafruit_INA219.h"
 
 // I/O PINs
@@ -63,7 +65,7 @@ protected:
   * @param pCommand 
   * @return String 
   */
-  String onGET(const String& pCommand);
+  String onGet(const String& pCommand, const String& pData);
 
   /**
   * @brief Event from web server on POST command
@@ -71,7 +73,7 @@ protected:
   * @param pCommand 
   * @param pData 
   */
-  void onPOST(const String& pCommand, const String& pData);
+  void onSet(const String& pCommand, const String& pData);
   
   /**
    * @brief Background Update event 

@@ -35,7 +35,7 @@ CLog::CLog ()
 #if defined(LOG_VERBOSE)
     _level = VERBOSE;
 
-#elif defined(LOG_DBG)
+#elif defined(LOG_DEBUG)
     _level = DEBUG;
 #else
     _level = NORMAL;
@@ -66,6 +66,7 @@ void CLog::Message (const String& pMessage, bool pCR, Level pLevel)
         {
             Serial.print(pMessage);
         }
+        Serial.flush();
     }
 }
 

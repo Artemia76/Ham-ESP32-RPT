@@ -25,14 +25,12 @@
 #define WEBSERVER_HPP
 
 #include <ESPAsyncWebServer.h>
-#include <SPIFFS.h>
 #include <vector>
-#include <regex>
+//#include <regex>
 #include <AsyncTimer.h>
 
 #include "appevent.hpp"
 #include "webserverevent.hpp"
-#include "env.hpp"
 #include "log.hpp"
 #include "singleton.hpp"
 
@@ -56,12 +54,7 @@ public:
 
 
 protected:
-    void _onGetRepOn (AsyncWebServerRequest *request);
-    void _onGetRepOff (AsyncWebServerRequest *request);
-    void _onGetCTCSSOn (AsyncWebServerRequest *request);
-    void _onGetCTCSSOff (AsyncWebServerRequest *request);
-    void _onGetRSSI (AsyncWebServerRequest *request);
-    void _onGetSet (AsyncWebServerRequest *request);
+
     /**
     * @brief Background Update event 
     * 

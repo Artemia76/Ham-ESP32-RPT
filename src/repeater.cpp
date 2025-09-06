@@ -38,7 +38,8 @@ CRepeater::CRepeater() :
     _TOT_Counter(0),
     _HalfSecondBlink(false),
     _enabled(true),
-    _squelch(9)
+    _squelch(9),
+    _RSSI(0.0)
 {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
@@ -284,25 +285,14 @@ void CRepeater::OnUpdate()
 
 }
 
-String CRepeater::onGET(const String& pCommand)
+String CRepeater::onGet(const String& pCommand, const String& pData)
 {
   String Result = "";
   if (pCommand == "RSSI")
   {
     Result = String(_RSSI);
   }
-  else if (pCommand == "RepOff")
-  {
-    _enabled =false;
-    Actions(IDLE);
-    Result = "OK";
-  }
-  else if (pCommand == "RepOn")
-  {
-    _enabled =true;
-    Result = "OK";
-  }
-  else if (pCommand == "Init")
+  else if (pCommand == "Config")
   {
     JsonDocument json;
     json["state"] =  _enabled;
@@ -313,7 +303,18 @@ String CRepeater::onGET(const String& pCommand)
   return Result;
 }
 
-void CRepeater::onPOST(const String& pCommand, const String& pData)
+void CRepeater::onSet(const String& pCommand, const String& pData)
 {
-
+  if (pCommand == "Rep")
+  {
+    if (pData == "true")
+    {
+      _enabled=true;
+    }
+    else if (pData == "false")
+    {
+      _enabled=false;
+      Actions(IDLE);
+    }
+  }
 }

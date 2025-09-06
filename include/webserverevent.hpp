@@ -53,14 +53,14 @@ public:
 
 protected:
 
-virtual String onGET(const String& pCommand)=0;
+virtual String onGet(const String& pCommand, const String& pData)=0;
 
     /**
      * @brief Process HTTP GET CommandEvent Callback
      * 
      * @param pCommand // #define DEBUG
      */
-virtual void onPOST(const String& pCommand, const String& pData)=0;
+virtual void onSet(const String& pCommand, const String& pData)=0;
 
 private:
     /**

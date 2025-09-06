@@ -27,6 +27,7 @@
 #include <Arduino.h>
 #include "singleton.hpp"
 #include <mutex>
+#include <vector>
 
 class CLog : public CSingleTon<CLog>
 {

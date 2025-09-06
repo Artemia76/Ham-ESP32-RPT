@@ -22,7 +22,12 @@
  */
 
 #include <algorithm>
+#include <LittleFS.h>
+#include <AsyncTCP.h>
+#include <WiFi.h>
+
 #include "webserver.hpp"
+#include "env.hpp"
 
 CWebServer::CWebServer () :
     _server (80),
@@ -33,13 +38,13 @@ CWebServer::CWebServer () :
     _log = CLog::Create();
     _log->Message ("Starting WebServer... ");
     int cnt = 0;
-    if(!SPIFFS.begin())
+    if(!LittleFS.begin())
     {
-        _log->Message ("SPIFFS Mounting Error...");
+        _log->Message ("LittleFS Mounting Error...");
         return;
     }
 
-    File root =  SPIFFS.open("/web");
+    File root =  LittleFS.open("/web");
     File file  = root.openNextFile();
 
     while(file)
@@ -73,52 +78,59 @@ CWebServer::CWebServer () :
     //--------------------------------------------SERVER
     _server.on("/",HTTP_GET, [](AsyncWebServerRequest *request)
     {
-        request->send(SPIFFS, "/web/index.html", "text/html");
+        request->send(LittleFS, "/web/index.html", "text/html");
     });
 
     _server.on("/w3.css",HTTP_GET, [](AsyncWebServerRequest *request)
     {
-        request->send(SPIFFS, "/web/w3.css", "text/css");
+        request->send(LittleFS, "/web/w3.css", "text/css");
     });
 
     _server.on("/custom.css",HTTP_GET, [](AsyncWebServerRequest *request)
     {
-        request->send(SPIFFS, "/web/custom.css", "text/javascript");
+        request->send(LittleFS, "/web/custom.css", "text/css");
     });
 
     _server.on("/script.js",HTTP_GET, [](AsyncWebServerRequest *request)
     {
-        request->send(SPIFFS, "/web/script.js", "text/javascript");
+        request->send(LittleFS, "/web/script.js", "text/javascript");
     });
 
-    _server.on("/getRSSI",HTTP_GET, [this](AsyncWebServerRequest *request)
+    _server.on("/get",HTTP_POST, [this](AsyncWebServerRequest *request)
     {
-        this->_onGetRSSI (request);
-    });
-
-    _server.on("/RepOn",HTTP_GET, [this](AsyncWebServerRequest *request)
-    {
-        this->_onGetRepOn (request);
-    });
-
-    _server.on("/RepOff",HTTP_GET, [this](AsyncWebServerRequest *request)
-    {
-        this->_onGetRepOff (request);
-    });
-
-    _server.on("/CTCSSOn",HTTP_GET, [this](AsyncWebServerRequest *request)
-    {
-        this->_onGetCTCSSOn (request);
-    });
-
-    _server.on("/CTCSSOff",HTTP_GET, [this](AsyncWebServerRequest *request)
-    {
-        this->_onGetCTCSSOff (request);
+        if (request->params() < 1) return;
+        String Key = request->getParam(0)->name();
+        String Param = request->getParam(0)->value();
+        _log->Message ("Received get Key = " + Key + " : Value = " + Param, CLog::DEBUG);
+        for (auto Subcriber : _subscribers)
+        {
+            if (Subcriber != nullptr)
+            {
+                String Value = Subcriber->onGet(Key, Param);
+                if (!Value.isEmpty())
+                {
+                    request->send(200,"text/plain", Value); 
+                    return;
+                }
+            }
+        }
+        request->send(404);
     });
 
     _server.on("/set",HTTP_POST, [this](AsyncWebServerRequest *request)
     {
-        this->_onGetSet (request);
+        if (request->params() < 1) return;
+        String Key = request->getParam(0)->name();
+        String Param = request->getParam(0)->value();
+        _log->Message ("Received set Key = " + Key + " : Value = " + Param, CLog::DEBUG);
+        for (auto Subcriber : _subscribers)
+        {
+            if (Subcriber != nullptr)
+            {
+                Subcriber->onSet(Key, Param);
+            }
+        }
+        request->send(200);
     });
     _server.begin();
 
@@ -140,107 +152,6 @@ CWebServer::~CWebServer ()
 
 /*****************************************************************************/
 
-void CWebServer::_onGetRepOn (AsyncWebServerRequest *request)
-{
-    for (auto Subcriber : _subscribers)
-    {
-        if (Subcriber != nullptr)
-        {
-            Subcriber->onGET("RepOn");
-        }
-    }
-    request->send(200);
-    _log->Message ("Received ON.", true , CLog::Level::DEBUG);
-}
-
-/*****************************************************************************/
-
-void CWebServer::_onGetRepOff (AsyncWebServerRequest *request)
-{
-    for (auto Subcriber : _subscribers)
-    {
-        if (Subcriber != nullptr)
-        {
-            Subcriber->onGET("RepOff");
-        }
-    }
-    request->send(200);
-    _log->Message ("Received RepOff.", true , CLog::Level::DEBUG);
-}
-
-/*****************************************************************************/
-
-void CWebServer::_onGetCTCSSOn (AsyncWebServerRequest *request)
-{
-    for (auto Subcriber : _subscribers)
-    {
-        if (Subcriber != nullptr)
-        {
-            Subcriber->onGET("CTCSSOn");
-        }
-    }
-    request->send(200);
-    _log->Message ("Received CTCSSOn.", true, CLog::Level::DEBUG);
-}
-
-/*****************************************************************************/
-
-void CWebServer::_onGetCTCSSOff (AsyncWebServerRequest *request)
-{
-    for (auto Subcriber : _subscribers)
-    {
-        if (Subcriber != nullptr)
-        {
-            Subcriber->onGET("CTCSSOff");
-        }
-    }
-    request->send(200);
-    _log->Message ("Received CTCSSOff.", true, CLog::Level::DEBUG);
-}
-
-/*****************************************************************************/
-
-void CWebServer::_onGetRSSI (AsyncWebServerRequest *request)
-{
-    String Value;
-    for (auto Subcriber : _subscribers)
-    {
-        if (Subcriber != nullptr)
-        {
-            Value= Subcriber->onGET("RSSI");
-            if (!Value.isEmpty())
-            {
-                request->send(200,"text/plain", Value); 
-                _log->Message ("Received Get RSSI = " + Value, true, CLog::Level::DEBUG);
-                return;
-            }
-        }
-    }
-}
-
-/*****************************************************************************/
-
-void CWebServer::_onGetSet (AsyncWebServerRequest *request)
-{
-    int paramsNr = request->params();
-    if (request->hasParam("rgb"))
-    {
-
-    }
-    const AsyncWebParameter * j = request->getParam("rgb"); // 1st parameter
-    for (auto Subcriber : _subscribers)
-    {
-        if (Subcriber != nullptr)
-        {
-            Subcriber->onPOST("set",j->value());
-        }
-    }
-    request->send(200);
-
-}
-
-/*****************************************************************************/
-
 void CWebServer::_subscribe(CWebServerEvent* pSubscriber)
 {
     if (std::find(_subscribers.begin(), _subscribers.end(),pSubscriber) == _subscribers.end())
@@ -256,15 +167,21 @@ void CWebServer::_unSubscribe(CWebServerEvent* pSubscriber)
     _subscribers.erase(std::remove(_subscribers.begin(), _subscribers.end(), pSubscriber), _subscribers.end());
 }
 
+/*****************************************************************************/
+
 void CWebServer::OnTimer1SCB()
 {
   CWebServer::Create()->OnTimer1S();
 }
 
+/*****************************************************************************/
+
 void CWebServer::OnTimer1S()
 {
     _log->Message("Wifi RSSI = " + String(WiFi.RSSI()),CLog::VERBOSE);
 }
+
+/*****************************************************************************/
 
 void CWebServer::OnUpdate()
 {
