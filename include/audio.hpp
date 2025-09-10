@@ -118,7 +118,6 @@ private:
     OutputMixer<int16_t> _mixer; 
     BufferedStream _mixerIn1;
     BufferedStream _mixerIn2;
-    //VolumeMeter _volumeMeter;
     AudioRealFFT _fft;
     MultiOutput _multiOutput;
     CircularBuffer <AudioFFTResult,10> _FFTBuf;
@@ -129,6 +128,7 @@ private:
     StreamCopy _ctcss_copier;
 
     bool _CTCSSEnabled;
+    bool _audio_ok;
     float _mag_ref;
     std::map <String, File> _catalog;
     static void fftResultCB (AudioFFTBase &fft);

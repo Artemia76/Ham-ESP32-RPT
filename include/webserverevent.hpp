@@ -26,7 +26,10 @@
 
 #include <Arduino.h>
 
-// Use atomic to share async mutlithreaded 
+/**
+ * @brief CWebServer declaration to use it has friend class in event abstract class
+ * 
+ */
 
 class CWebServer;
 
@@ -52,11 +55,17 @@ public:
     ~CWebServerEvent();
 
 protected:
-
+    /**
+     * @brief Process POST HTTP "Get" CommandEvent Callback
+     * 
+     * @param pCommand 
+     * @param pData 
+     * @return String 
+     */
 virtual String onGet(const String& pCommand, const String& pData)=0;
 
     /**
-     * @brief Process HTTP GET CommandEvent Callback
+     * @brief Process POST HTTP "Set" CommandEvent Callback
      * 
      * @param pCommand // #define DEBUG
      */
@@ -70,4 +79,4 @@ private:
     CWebServer*  _webServer;
 };
 
-#endif
+#endif //WEBSERVEREVENT_HPP

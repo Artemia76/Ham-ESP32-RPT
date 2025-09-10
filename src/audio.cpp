@@ -29,18 +29,18 @@
     _mixer(_out, 3),
     _mixerIn1(1024,_mixer),
     _mixerIn2(1024,_mixer),
-    //_volumeMeter(_mixerIn1),
     _multiOutput(_mixerIn1,_fft),
     _source("/wav",".wav"),
     _player(_source,_mixerIn2,_decoder),
     _inCopier(_multiOutput, _in, 1024),
-    //_wavCopier(_decoder,_audioFile),
     _ctcss_copier(_mixer,_ctcss),
     _mag_ref(10000000.0),
-    _CTCSSEnabled(false)
+    _CTCSSEnabled(false),
+    _audio_ok(false)
 {
     _log = CLog::Create();
     _log->Message("Starting Audio... ",false);
+    
     //
     // Configure in stream
     //
@@ -53,7 +53,11 @@
     configin.pin_bck = AD_SCLK;                       // SCLK
     configin.pin_data = AD_SDIN;                      // SDOUT
     configin.pin_mck = AD_MCLK;
-    _in.begin(configin);
+    if (!_in.begin(configin))
+    {
+      _log->Message("Failed : Unable to found I2S ADC");
+      return;
+    }
     
     //
     // Configure out stream
@@ -67,7 +71,11 @@
     configout.pin_bck = DA_SCLK;                       // SCLK
     configout.pin_data = DA_SDIN;                      // SDOUT
     configout.pin_mck = DA_MCLK;
-    _out.begin(configout);
+    if (!_out.begin(configout))
+    {
+      _log->Message("Failed : Unable to found I2S DAC");
+      return;
+    }
 
     //
     // Configure FFT
@@ -77,12 +85,11 @@
     tcfg.copyFrom(_info);
     //tcfg.window_function = new BlackmanHarris;
     tcfg.callback = CAudio::fftResultCB;
-    _fft.begin(tcfg);
-
-    //
-    // Configure Volume Meter
-    //
-    //_volumeMeter.begin(_info);
+    if (!_fft.begin(tcfg))
+    {
+      _log->Message("Failed : Unable to set FFT");
+      return;
+    }
 
     //
     // Configure Player
@@ -90,25 +97,40 @@
     _player.setAudioInfo(_info);
     _player.setSilenceOnInactive(true);
     _player.setAutoFade(true);
-    _player.begin(0,false);
+    if (!_player.begin(0,false))
+    {
+      _log->Message("Failed : Unable to set Player");
+      return;
+    }
 
     //
     // CTCSS Generator
     //
     _ctcss_sine.setFrequency(62.5);
-    _ctcss.begin(_info);
+    if (!_ctcss.begin(_info))
+    {
+      _log->Message("Failed : Unable to set sine generator");
+      return;
+    }
+
     //
     // Configure Mixer
     //
-    _mixer.begin(1024);
-
+    if (!_mixer.begin(1024))
+    {
+      _log->Message("Failed : Unable to set mixer");
+      return;
+    }
+    _audio_ok = true;
     _log->Message("OK");
 }
 
-/// @brief Detect a 1750 Hz tone 
-/// @return true is 1750 Hz is detected
+/*****************************************************************************/
+
 bool CAudio::Is1750Detected ()
 {
+  if (!_audio_ok) return false;
+
   float tolerance = 100; // Tolérance de détection
   // Si il n'y a pas assez de données dans le buffer on passe
   if (_FFTBuf.size() <10 ) return false;
@@ -128,10 +150,14 @@ bool CAudio::Is1750Detected ()
   return false;
 }
 
+/*****************************************************************************/
+
 void CAudio::fftResultCB(AudioFFTBase &fft)
 {
   CAudio::Create()->fftResult(fft);
 }
+
+/*****************************************************************************/
 
 void CAudio::fftResult(AudioFFTBase &fft)
 {
@@ -146,27 +172,37 @@ void CAudio::fftResult(AudioFFTBase &fft)
   }
 }
 
+/*****************************************************************************/
+
 bool CAudio::IsCTCSSEnabled()
 {
   return _CTCSSEnabled;
 }
 
+/*****************************************************************************/
+
 void CAudio::SetVolume(int pChannel, float pValue)
 {
+  if (!_audio_ok) return;
   if ((pChannel < 0) || (pChannel > 2)) return;
   if ((pValue < 0.0) || (pValue > 1.0)) return;
   _mixer.setWeight(pChannel, pValue);
 }
 
+/*****************************************************************************/
+
 void CAudio::Play(const String& pSound)
 {
-  //_player.begin(pTrack);
+  if (!_audio_ok) return;
   _player.setPath(String("/wav/" + pSound).c_str());
   _player.setAutoNext(false);
 }
 
+/*****************************************************************************/
+
 void CAudio::OnUpdate()
 {
+    if (!_audio_ok) return;
     // Audio Processing
     _inCopier.copy();
     _player.copy();

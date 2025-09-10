@@ -28,6 +28,7 @@
 #include <atomic>
 #include <AsyncTimer.h>
 #include <Preferences.h>
+#include <INA219.h>
 
 #include "log.hpp"
 #include "appevent.hpp"
@@ -35,7 +36,6 @@
 #include "audio.hpp"
 #include "rssi.hpp"
 #include "webserverevent.hpp"
-#include "Adafruit_INA219.h"
 
 // I/O PINs
 #define RX_LED 15
@@ -114,7 +114,7 @@ protected:
     uint8_t _counter;
     AsyncTimer _t1s;
     AsyncTimer _t500ms;
-    Adafruit_INA219 _ina219;
+    INA219 _ina219;
     int _lastState;
     int _currentState;
     float _RSSI;
@@ -127,6 +127,7 @@ protected:
     float _CD_Threshold; //RSSI threshold(Squelch)
     int _squelch;
     bool _HalfSecondBlink;
+    bool _ina219_ok;
     CRSSI _rssi2signal;
 
     static void OnTimer1SCB ();

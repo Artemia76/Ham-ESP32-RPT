@@ -29,6 +29,8 @@
     _app->_subscribe(this);
  }
 
+/*****************************************************************************/
+
  CAppEvent::~CAppEvent ()
  {
     _app->_unSubscribe(this);

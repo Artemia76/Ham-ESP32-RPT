@@ -95,4 +95,4 @@ private:
     CLog* _log;
 };
 
-#endif
+#endif //APP_HPP

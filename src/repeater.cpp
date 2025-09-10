@@ -21,8 +21,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#include "repeater.hpp"
 #include <ArduinoJson.h>
+
+#include "repeater.hpp"
 
 CRepeater::CRepeater() :
     _step(IDLE),
@@ -39,7 +40,9 @@ CRepeater::CRepeater() :
     _HalfSecondBlink(false),
     _enabled(true),
     _squelch(9),
-    _RSSI(0.0)
+    _RSSI(0.0),
+    _ina219(0x40),
+    _ina219_ok(false)
 {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
@@ -64,7 +67,8 @@ CRepeater::CRepeater() :
   }
   else
   {
-    _RSSI = _ina219.getBusVoltage_V();
+    _ina219_ok=true;
+    _RSSI = _ina219.getBusVoltage();
   }
   //
   // Setting Slow Timer
@@ -80,15 +84,21 @@ CRepeater::CRepeater() :
   _log->Message("OK");
 }
 
+/*****************************************************************************/
+
 CRepeater::~CRepeater()
 {
 
 }
 
+/*****************************************************************************/
+
 void CRepeater::OnTimer500msCB()
 {
   CRepeater::Create()->OnTimer500ms();
 }
+
+/*****************************************************************************/
 
 void CRepeater::OnTimer500ms()
 {
@@ -121,10 +131,14 @@ void CRepeater::OnTimer500ms()
   _HalfSecondBlink = !_HalfSecondBlink;
 }
 
+/*****************************************************************************/
+
 void CRepeater::OnTimer1SCB()
 {
   CRepeater::Create()->OnTimer1S();
 }
+
+/*****************************************************************************/
 
 void CRepeater::OnTimer1S()
 {
@@ -192,6 +206,8 @@ void CRepeater::OnTimer1S()
   _log->Message("RSSI=" + String(_RSSI) + " TOT Timer = " + String(_TOT_Counter),true, CLog::VERBOSE);
 }
 
+/*****************************************************************************/
+
 void CRepeater::Actions(const Steps& pStep)
 {
   if (!_switch) return;
@@ -240,6 +256,8 @@ void CRepeater::Actions(const Steps& pStep)
   _step = pStep;
 }
 
+/*****************************************************************************/
+
 void CRepeater::OnUpdate()
 {
   if (_enabled)
@@ -251,8 +269,8 @@ void CRepeater::OnUpdate()
     }
     _lastState = _currentState;
     // Read RSSI and if threshold, play a K
-    if (_ina219.success())
-      _RSSI = _ina219.getBusVoltage_V();
+    if (_ina219_ok)
+      _RSSI = _ina219.getBusVoltage();
 
     _CD = (_RSSI > _CD_Threshold);
     if (_CD != _lastCD)
@@ -285,6 +303,8 @@ void CRepeater::OnUpdate()
 
 }
 
+/*****************************************************************************/
+
 String CRepeater::onGet(const String& pCommand, const String& pData)
 {
   String Result = "";
@@ -302,6 +322,8 @@ String CRepeater::onGet(const String& pCommand, const String& pData)
   }
   return Result;
 }
+
+/*****************************************************************************/
 
 void CRepeater::onSet(const String& pCommand, const String& pData)
 {

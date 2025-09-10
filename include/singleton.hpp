@@ -87,4 +87,4 @@ private :
 //----------------------------------------------------------------
 template <class T> T* CSingleTon<T>::Inst = NULL;
 
-#endif
+#endif //CSINGLETON_HPP

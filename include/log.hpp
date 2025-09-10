@@ -72,4 +72,4 @@ private:
      */
     Level _level;
 };
-#endif
+#endif //LOG_HPP

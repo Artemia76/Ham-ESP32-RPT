@@ -71,4 +71,4 @@ private:
     CApp* _app;
 };
 
-#endif
+#endif //APPEVENT_HPP
