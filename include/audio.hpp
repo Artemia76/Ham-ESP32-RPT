@@ -26,7 +26,7 @@
 
 #include <AudioTools.h>
 #include <AudioTools/AudioLibs/AudioRealFFT.h>
-#include <AudioTools/AudioLibs/AudioSourceLittleFS.h>
+#include <AudioTools/Disk/AudioSourceLittleFS.h>
 #include <map>
 #include <CircularBuffer.hpp>
 
