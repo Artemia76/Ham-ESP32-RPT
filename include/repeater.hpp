@@ -129,6 +129,7 @@ protected:
     bool _HalfSecondBlink;
     bool _ina219_ok;
     CRSSI _rssi2signal;
+    Preferences _config;
 
     static void OnTimer1SCB ();
     static void OnTimer500msCB ();

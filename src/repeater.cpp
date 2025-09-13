@@ -80,6 +80,10 @@ CRepeater::CRepeater() :
   //
   _t500ms.setInterval(CRepeater::OnTimer500msCB,500);
 
+  // Load Config
+  _config.begin("repeater",false);
+  _enabled = _config.getBool("Enabled","true");
+
   Actions(IDLE);
   _log->Message("OK");
 }
@@ -338,5 +342,6 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
       _enabled=false;
       Actions(IDLE);
     }
+    _config.putBool("Enabled",_enabled);
   }
 }
