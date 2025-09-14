@@ -32,7 +32,7 @@ CRepeater::CRepeater() :
     _lastState(HIGH),
     _currentState(HIGH),
     _switch(true),
-    _CD_Threshold(1.75),
+    _CD_Threshold(2),
     _CD(false),
     _antiBounce(0),
     _TOT(180),
@@ -41,7 +41,6 @@ CRepeater::CRepeater() :
     _enabled(true),
     _squelch(9),
     _RSSI(0.0),
-    _ina219(0x40),
     _ina219_ok(false)
 {
   _log = CLog::Create();
@@ -68,7 +67,7 @@ CRepeater::CRepeater() :
   else
   {
     _ina219_ok=true;
-    _RSSI = _ina219.getBusVoltage();
+    _RSSI = _ina219.getBusVoltage_V();
   }
   //
   // Setting Slow Timer
@@ -270,7 +269,7 @@ void CRepeater::OnUpdate()
     _lastState = _currentState;
     // Read RSSI and if threshold, play a K
     if (_ina219_ok)
-      _RSSI = _ina219.getBusVoltage();
+      _RSSI = _ina219.getBusVoltage_V();
 
     _CD = (_RSSI > _CD_Threshold);
     if (_CD != _lastCD)

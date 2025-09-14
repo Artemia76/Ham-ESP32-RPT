@@ -142,7 +142,7 @@ bool CAudio::Is1750Detected ()
 			if (
         (_FFTBuf[i].frequency < (1750.0 + tolerance)) &&
         (_FFTBuf[i].frequency > (1750.0-tolerance)) &&
-        (_FFTBuf[i].magnitude > 100000.0))
+        (_FFTBuf[i].magnitude > 40.0))
       {
         return true;
       }

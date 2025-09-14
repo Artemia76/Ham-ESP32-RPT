@@ -27,8 +27,8 @@
 //#include <Wire.h>
 #include <atomic>
 #include <AsyncTimer.h>
-#include <Preferences.h>
-#include <INA219.h>
+//#include <Preferences.h>
+#include <Adafruit_INA219.h>
 
 #include "log.hpp"
 #include "appevent.hpp"
@@ -114,7 +114,7 @@ protected:
     uint8_t _counter;
     AsyncTimer _t1s;
     AsyncTimer _t500ms;
-    INA219 _ina219;
+    Adafruit_INA219 _ina219;
     int _lastState;
     int _currentState;
     float _RSSI;
