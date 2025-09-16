@@ -34,7 +34,7 @@ class CLog : public CSingleTon<CLog>
     friend class CSingleTon <CLog>;
 public:
     /**
-     * @brief Enumaration of critical level
+     * @brief Enumaration of critical levels
      * 
      */
      enum Level
