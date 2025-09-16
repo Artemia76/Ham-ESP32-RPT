@@ -84,16 +84,27 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-There are many great README templates available on GitHub; however, I didn't find one that really suited my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need -- I think this is it.
+This project aim to purpose universal HAM Radio Analog Repeater based on ESP32 MCU.
 
-Here's why:
-* Your time should be focused on creating something amazing. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like creating a README from scratch
-* You should implement DRY principles to the rest of your life :smile:
+It based on :
+  * ESP32-S3 DevKit Wroom board
+  * PmodI2S2 ADC + DAC I2S moodule
+  * INA 219 I2C Voltage measurement chip
 
-Of course, no one template will serve all projects since your needs may be different. So I'll be adding more in the near future. You may also suggest changes by forking this repo and creating a pull request or opening an issue. Thanks to all the people have contributed to expanding this template!
+In addition (optional) we add :
+  * Audio monitoring amplifier
+  * Test button
+  * Red an Green LED state indication
 
-Use the `BLANK_README.md` to get started.
+The Repeater feature are :
+  * Stream in the RX audio
+  * Stream out the TX audio
+  * Play start and end announce
+  * Detect 1750 Hz tone to engage
+  * Read RSSI value by using voltage reading through _ina219 chip
+  * TOT ( time out timer) management
+  * Web management through WiFi
+  * 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -101,9 +112,12 @@ Use the `BLANK_README.md` to get started.
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 
 * [![PIO Arduino][PIO.js]][PIO-url]
+
+KiCAD for PCB design
+
+Audacity for wav design
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -162,7 +176,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Audio 1750 Hz FFT Detection
 - [x] Repeater Sequence
 - [ ] Web Management
-- [ ] Permanent Memory
+- [X] Permanent Memory
 - [ ] PCB Design
 
 See the [open issues](https://github.com/Artemia76/Ham-ESP32-RPT/issues) for a full list of proposed features (and known issues).

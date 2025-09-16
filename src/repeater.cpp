@@ -32,7 +32,6 @@ CRepeater::CRepeater() :
     _lastState(HIGH),
     _currentState(HIGH),
     _switch(true),
-    _CD_Threshold(1.75),
     _CD(false),
     _antiBounce(0),
     _TOT(180),
@@ -40,7 +39,6 @@ CRepeater::CRepeater() :
     _HalfSecondBlink(false),
     _enabled(true),
     _squelch(9),
-    _RSSI(0.0),
     _ina219(0x40),
     _ina219_ok(false)
 {
@@ -61,14 +59,15 @@ CRepeater::CRepeater() :
   // Initialize the INA219.
   // By default the initialization will use the largest range (32V, 2A).  However
   // you can call a setCalibration function to change this range (see comments).
+  Wire.begin();
   if (! _ina219.begin())
   {
-    _log->Message("Failed to find INA219 chip");
+    _log->Message("Failed to find INA219 chip SDA="+ String(SDA) + " SDL=" +String(SCL));
   }
   else
   {
     _ina219_ok=true;
-    _RSSI = _ina219.getBusVoltage();
+    _RSSI = _rssi2signal.getByVoltage(_ina219.getBusVoltage());
   }
   //
   // Setting Slow Timer
@@ -207,7 +206,10 @@ void CRepeater::OnTimer1S()
     _antiBounce--;
     if (_antiBounce==0) _audio->SetVolume(1,0.0);
   }
-  _log->Message("RSSI=" + String(_RSSI) + " TOT Timer = " + String(_TOT_Counter),true, CLog::VERBOSE);
+  _log->Message("RSSI dBm = " + String(_RSSI.dBm) +
+    " RSSI S = " +String(_RSSI.S) +
+    " RSSI V = " +String(_RSSI.V) +
+    " TOT Timer = " + String(_TOT_Counter),true, CLog::DEBUG);
 }
 
 /*****************************************************************************/
@@ -274,9 +276,9 @@ void CRepeater::OnUpdate()
     _lastState = _currentState;
     // Read RSSI and if threshold, play a K
     if (_ina219_ok)
-      _RSSI = _ina219.getBusVoltage();
+      _RSSI = _rssi2signal.getByVoltage(_ina219.getBusVoltage());
 
-    _CD = (_RSSI > _CD_Threshold);
+    _CD = (_RSSI.S >= _squelch);
     if (_CD != _lastCD)
     {
       if (_step == REPEATER)
@@ -314,7 +316,7 @@ String CRepeater::onGet(const String& pCommand, const String& pData)
   String Result = "";
   if (pCommand == "RSSI")
   {
-    Result = String(_RSSI);
+    Result = String(_RSSI.S);
   }
   else if (pCommand == "Config")
   {

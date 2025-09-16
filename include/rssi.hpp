@@ -24,19 +24,25 @@
 #ifndef RSSI_HPP
 #define RSSI_HPP
 
-#include "log.hpp"
-
-#include <SPIFFS.h>
 #include <map>
 #include <algorithm>
-#include <SPIFFS.h>
+#include <LittleFS.h>
 #include <ArduinoJson.h>
 
-struct RSSIData
+#include "log.hpp"
+
+class RSSIData
 {
+public:
+    RSSIData ()
+    {
+        V= 0.0;
+        dBm = 0.0;
+        S = 0;
+    }
     float V;
     float dBm;
-    float S;
+    int S;
 };
 
 class CRSSI
@@ -55,39 +61,10 @@ public:
      */
     ~CRSSI();
 
-    /**
-     * @brief Add RSSI data
-     * 
-     * @param pRSSI RSSI data to add
-     */
-    void addRSSIData(const RSSIData& pRSSI);
-
-    /**
-     * @brief Get RSSI data
-     * 
-     * @return std::map<float, RSSIData> Map of RSSI data
-     */
-    std::map<float, RSSIData> getRSSIData();
-    /**
-     * @brief Clear all RSSI data
-     * 
-     */
-    void clearRSSIData();  
-    /**
-     * @brief Save RSSI data to SPIFFS
-     * 
-     * @return true if save was successful, false otherwise
-     */
-    bool saveRSSIDataToSPIFFS();
-    /**
-     * @brief Load RSSI data from SPIFFS
-     * 
-     * @return true if load was successful, false otherwise
-     */
-    bool loadRSSIDataFromSPIFFS();
-
-
+    RSSIData getByVoltage(float pV);
 private:
+
+    bool loadRSSIData();
     /**
      * @brief Map to store RSSI data
      * 
@@ -103,6 +80,11 @@ private:
      * @brief Mutex to protect against concurrent access
      * 
      */
+
+    float _low_lim;
+
+    float _high_lim;
+
     std::mutex _mutex;
     /**
      * @brief Prevent copy construction

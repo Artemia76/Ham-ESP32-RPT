@@ -34,9 +34,11 @@
     _player(_source,_mixerIn2,_decoder),
     _inCopier(_multiOutput, _in, 1024),
     _ctcss_copier(_mixer,_ctcss),
-    _mag_ref(10000000.0),
+    _mag_threshold(50.0),
+    _1750_hyst(100.0),
     _CTCSSEnabled(false),
     _audio_ok(false)
+    
 {
     _log = CLog::Create();
     _log->Message("Starting Audio... ",false);
@@ -81,9 +83,9 @@
     // Configure FFT
     //
     auto tcfg = _fft.defaultConfig();
-    tcfg.length = 512;
     tcfg.copyFrom(_info);
-    //tcfg.window_function = new BlackmanHarris;
+    tcfg.length = 512;
+    tcfg.window_function = new BufferedWindow(new Hamming());
     tcfg.callback = CAudio::fftResultCB;
     if (!_fft.begin(tcfg))
     {
@@ -131,21 +133,19 @@ bool CAudio::Is1750Detected ()
 {
   if (!_audio_ok) return false;
 
-  float tolerance = 100; // Tolérance de détection
   // Si il n'y a pas assez de données dans le buffer on passe
-  if (_FFTBuf.size() <10 ) return false;
+  if (_FFTBuf.size() <5 ) return false;
   using index_t = decltype(_FFTBuf)::index_t;
 	for (index_t i = 0; i < _FFTBuf.size(); i++)
   {
-
-      _log->Message("Freq = " + String(_FFTBuf[i].frequency) + " Magnitude = "+ String(_FFTBuf[i].magnitude),true,CLog::VERBOSE);
-			if (
-        (_FFTBuf[i].frequency < (1750.0 + tolerance)) &&
-        (_FFTBuf[i].frequency > (1750.0-tolerance)) &&
-        (_FFTBuf[i].magnitude > 100000.0))
-      {
-        return true;
-      }
+    _log->Message("Freq = " + String(_FFTBuf[i].frequency) + " Magnitude = "+ String(_FFTBuf[i].magnitude),true,CLog::VERBOSE);
+    if (
+      (_FFTBuf[i].frequency < (1750.0 + _1750_hyst)) &&
+      (_FFTBuf[i].frequency > (1750.0 - _1750_hyst)) &&
+      (_FFTBuf[i].magnitude > _mag_threshold))
+    {
+      return true;
+    }
 	}
   return false;
 }
@@ -161,15 +161,20 @@ void CAudio::fftResultCB(AudioFFTBase &fft)
 
 void CAudio::fftResult(AudioFFTBase &fft)
 {
-  float diff;
-  float CarriageAvg=0.0;
+  AudioFFTResult TopScore;
+  TopScore.magnitude= 0.0;
+  TopScore.frequency= 0.0;
   AudioFFTResult Score[5];
   fft.resultArray(Score);
   for (AudioFFTResult Line : Score)
   {
-    CarriageAvg += Line.magnitude / 5;
-    _FFTBuf.push(Line);
+    if (Line.magnitude > TopScore.magnitude)
+    {
+      TopScore.frequency = Line.frequency;
+      TopScore.magnitude = Line.magnitude;
+    }
   }
+  _FFTBuf.push(TopScore);
 }
 
 /*****************************************************************************/

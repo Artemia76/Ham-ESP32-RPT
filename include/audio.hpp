@@ -120,7 +120,7 @@ private:
     BufferedStream _mixerIn2;
     AudioRealFFT _fft;
     MultiOutput _multiOutput;
-    CircularBuffer <AudioFFTResult,10> _FFTBuf;
+    CircularBuffer <AudioFFTResult,5> _FFTBuf;
     WAVDecoder _decoder;
     AudioSourceLittleFS _source;
     AudioPlayer _player;
@@ -129,7 +129,8 @@ private:
 
     bool _CTCSSEnabled;
     bool _audio_ok;
-    float _mag_ref;
+    float _mag_threshold;
+    float _1750_hyst;
     std::map <String, File> _catalog;
     static void fftResultCB (AudioFFTBase &fft);
     void fftResult(AudioFFTBase &fft);

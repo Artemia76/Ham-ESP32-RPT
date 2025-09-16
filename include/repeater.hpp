@@ -117,14 +117,13 @@ protected:
     INA219 _ina219;
     int _lastState;
     int _currentState;
-    float _RSSI;
+    RSSIData _RSSI;
     int _TOT;
     int _TOT_Counter;
     bool _lastCD;
     bool _CD;
     bool _enabled;
     int _antiBounce;
-    float _CD_Threshold; //RSSI threshold(Squelch)
     int _squelch;
     bool _HalfSecondBlink;
     bool _ina219_ok;

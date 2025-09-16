@@ -23,10 +23,13 @@
 
 #include "rssi.hpp"
 
-CRSSI::CRSSI()
+CRSSI::CRSSI() :
+    _low_lim(5.0),
+    _high_lim(0.0)
 {
     _log = CLog::Create();
     _log->Message("Starting RSSI... ");
+    loadRSSIData();
 }
 
 CRSSI::~CRSSI()
@@ -34,67 +37,26 @@ CRSSI::~CRSSI()
     _log->Message("Destroying RSSI... ");
 }
 
-void CRSSI::addRSSIData(const RSSIData& pRSSI)
-{
-    std::lock_guard<std::mutex> lock(_mutex);
-    _rssiData[pRSSI.V] = pRSSI; // Use V as key
-    _log->Message("Added RSSI data: V=" + String(pRSSI.V) + ", dBm=" + String(pRSSI.dBm) + ", S=" + String(pRSSI.S), true, CLog::Level::DEBUG);
-}
 
-std::map<float, RSSIData> CRSSI::getRSSIData()
+bool CRSSI::loadRSSIData()
 {
     const std::lock_guard<std::mutex> lock(_mutex);
-    return _rssiData;
-}
-
-
-void CRSSI::clearRSSIData()
-{
-    std::lock_guard<std::mutex> lock(_mutex);
-    _rssiData.clear();
-    _log->Message("Cleared all RSSI data", true, CLog::Level::DEBUG);
-}
-
-bool CRSSI::saveRSSIDataToSPIFFS()
-{
-    std::lock_guard<std::mutex> lock(_mutex);
-    File file = SPIFFS.open("/conf/rssi_data.json", "w");
-    if (!file) {
-        _log->Message("Failed to open file for writing", true, CLog::Level::ERROR);
+    
+    if(!LittleFS.begin())
+    {
+        _log->Message ("LittleFS Mounting Error...",CLog::Level::ERROR);
         return false;
     }
-
-    JsonDocument doc;
-    for (const auto& entry : _rssiData) {
-        JsonObject obj = doc.add<JsonObject>();
-        obj["dBm"] = entry.first;
-        obj["V"] = entry.second.V;
-        obj["S"] = entry.second.S;
-    }
-
-    if (serializeJson(doc, file) == 0) {
-        _log->Message("Failed to write RSSI data to file", true, CLog::Level::ERROR);
-        return false;
-    }
-
-    file.close();
-    _log->Message("RSSI data saved successfully", true, CLog::Level::DEBUG);
-    return true;
-}
-
-bool CRSSI::loadRSSIDataFromSPIFFS()
-{
-    const std::lock_guard<std::mutex> lock(_mutex);
-    File file = SPIFFS.open("/conf/rssi_data.json", "r");
+    File file = LittleFS.open("/conf/rssi_data.json", "r");
     if (!file) {
-        _log->Message("Failed to open file for reading", true, CLog::Level::ERROR);
+        _log->Message("Failed to open file for reading", CLog::Level::ERROR);
         return false;
     }
 
     JsonDocument doc;
     DeserializationError error = deserializeJson(doc, file);
     if (error) {
-        _log->Message("Failed to parse RSSI data from file: " + String(error.c_str()), true, CLog::Level::ERROR);
+        _log->Message("Failed to parse RSSI data from file: " + String(error.c_str()), CLog::Level::ERROR);
         file.close();
         return false;
     }
@@ -104,11 +66,50 @@ bool CRSSI::loadRSSIDataFromSPIFFS()
         RSSIData rssiData;
         rssiData.dBm = obj["dBm"].as<float>();
         rssiData.V = obj["V"].as<float>();
-        rssiData.S = obj["S"].as<float>();
-        addRSSIData(rssiData);
+        rssiData.S = obj["S"].as<int>();
+        _rssiData[rssiData.V]=rssiData;
+        if (_low_lim > rssiData.V)
+        {
+            _low_lim = rssiData.V;
+        }
+        if (_high_lim < rssiData.V)
+        {
+            _high_lim = rssiData.V;
+        }
     }
 
     file.close();
     _log->Message("RSSI data loaded successfully", true, CLog::Level::DEBUG);
     return true;
+}
+
+RSSIData CRSSI::getByVoltage(float pV)
+{
+    float low = _low_lim;
+    float high = _high_lim;
+    RSSIData data;
+    for (const auto& [key, value] : _rssiData)
+    {
+        if ((key >= pV) && (key < high))
+        {
+            high = key;
+        }
+        if ((key <= pV) && (key > low))
+        {
+            low = key;
+        }
+    }
+    if (low < high)
+    {
+        float ratio = (pV - low)/(high -low);
+        data.V = pV;
+        data.dBm = ((_rssiData[high].dBm - _rssiData[low].dBm) * ratio) + _rssiData[low].dBm;
+        data.S = _rssiData[low].S;
+        return data;
+    }
+    else if (( low == high) || ( pV < low))
+    {
+        return _rssiData[low];
+    }
+    return data;
 }
