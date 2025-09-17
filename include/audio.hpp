@@ -97,6 +97,8 @@ public:
      */
     void Play(const String& pSound);
 
+    bool IsPlaying ();
+
 protected:
 
     /**

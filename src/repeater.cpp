@@ -40,7 +40,10 @@ CRepeater::CRepeater() :
     _enabled(true),
     _squelch(9),
     _ina219(0x40),
-    _ina219_ok(false)
+    _ina219_ok(false),
+    _start_message("louise2.wav"),
+    _end_message("end.wav"),
+    _beep("beep.wav")
 {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
@@ -91,7 +94,7 @@ CRepeater::CRepeater() :
 
 CRepeater::~CRepeater()
 {
-
+  _config.end();
 }
 
 /*****************************************************************************/
@@ -106,7 +109,7 @@ void CRepeater::OnTimer500msCB()
 void CRepeater::OnTimer500ms()
 {
   // Animate Green leds
-  // If Carriage Detect in IDLE mode , we blink
+  // If Carriage Detect in IDLE mode , we blink Green Led
   if (_step==IDLE)
   {
     if (_CD && _step==IDLE)
@@ -119,6 +122,7 @@ void CRepeater::OnTimer500ms()
     }
     digitalWrite(TX_LED, LOW);
   }
+  //if Carriage not detected during Repeater active, we blink Red led
   else
   {
     if (!_CD || _step==ANNONCE_FIN)
@@ -161,18 +165,24 @@ void CRepeater::OnTimer1S()
       }
       if (_counter >= 1)
       {
+        Actions(START_TX);
+      }
+      break;
+    }
+    case START_TX:
+    {
+      _counter ++;
+      if(_counter>1)
+      {
         Actions(ANNONCE_DEB);
-        _counter=0;
       }
       break;
     }
     case ANNONCE_DEB:
     {
-      _counter++;
-      if (_counter > 2)
+      if (!_audio->IsPlaying())
       {
         Actions(REPEATER);
-        _counter=0;
       }
       break;
     }
@@ -185,19 +195,24 @@ void CRepeater::OnTimer1S()
       if ((_counter > 10) || (_TOT_Counter >= _TOT))
       {
         Actions(ANNONCE_FIN);
-        _counter=0;
       }
       break;
     }
     case ANNONCE_FIN:
     {
-      _counter++;
-      if (_counter > 3)
+      if (!_audio->IsPlaying())
       {
-        Actions(IDLE);
-        _counter=0;
+        Actions(END_TX);
       }
       break;
+    }
+    case END_TX:
+    {
+      _counter++;
+      if (_counter > 1)
+      {
+        Actions(IDLE);
+      }
     }
   }
   //Reset _antiBounce
@@ -216,6 +231,7 @@ void CRepeater::OnTimer1S()
 
 void CRepeater::Actions(const Steps& pStep)
 {
+  _counter = 0;
   if (!_switch) return;
   switch (pStep)
   {
@@ -228,6 +244,12 @@ void CRepeater::Actions(const Steps& pStep)
       digitalWrite(PTT,LOW);
       break;
     }
+    case START_TX:
+    {
+      _log->Message("Switch to TX");
+      digitalWrite(PTT,HIGH);
+      break;
+    }
     case ANNONCE_DEB:
     {
       _log->Message("Annonce début");
@@ -235,8 +257,7 @@ void CRepeater::Actions(const Steps& pStep)
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
       if ( _audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
-      _audio->Play("louise2.wav");
-      digitalWrite(PTT,HIGH);
+      _audio->Play(_start_message);
       break;
     }
     case REPEATER:
@@ -255,7 +276,12 @@ void CRepeater::Actions(const Steps& pStep)
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
-      _audio->Play("end.wav");
+      _audio->Play(_end_message);
+      break;
+    }
+    case END_TX:
+    {
+      _log->Message("End TX");
       break;
     }
   }
@@ -271,7 +297,7 @@ void CRepeater::OnUpdate()
     _currentState = digitalRead(ANNONCE_BTN);
     if (_lastState == LOW && _currentState == HIGH)
     {
-      Actions(ANNONCE_DEB);
+      Actions(START_TX);
     }
     _lastState = _currentState;
     // Read RSSI and if threshold, play a K
@@ -296,7 +322,7 @@ void CRepeater::OnUpdate()
         if ((!_CD) && (_antiBounce==0))
         {
           _audio->SetVolume(1,1.0);
-          _audio->Play("beep.wav");
+          _audio->Play(_beep);
           _TOT_Counter = 0;
           _antiBounce = 2;
         } 

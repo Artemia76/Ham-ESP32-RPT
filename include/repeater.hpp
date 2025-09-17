@@ -43,12 +43,18 @@
 #define ANNONCE_BTN 11
 #define PTT 12
 
+/**
+ * @brief Sequence step of repeater Grafcet
+ * 
+ */
 enum Steps
 {
   IDLE,
+  START_TX,
   ANNONCE_DEB,
   REPEATER,
-  ANNONCE_FIN
+  ANNONCE_FIN,
+  END_TX
 };
 
 class CRepeater : public CSingleTon<CRepeater>, CAppEvent, CWebServerEvent
@@ -129,6 +135,9 @@ protected:
     bool _ina219_ok;
     CRSSI _rssi2signal;
     Preferences _config;
+    String _start_message;
+    String _end_message;
+    String _beep;
 
     static void OnTimer1SCB ();
     static void OnTimer500msCB ();

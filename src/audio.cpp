@@ -205,6 +205,11 @@ void CAudio::Play(const String& pSound)
 
 /*****************************************************************************/
 
+bool CAudio::IsPlaying()
+{
+  return _player.isActive();
+}
+
 void CAudio::OnUpdate()
 {
     if (!_audio_ok) return;
