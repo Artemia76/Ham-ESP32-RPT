@@ -172,7 +172,7 @@ void CRepeater::OnTimer1S()
     case START_TX:
     {
       _counter ++;
-      if(_counter>1)
+      if ((_counter>1) && (!_audio->Is1750Detected()))
       {
         Actions(ANNONCE_DEB);
       }
@@ -263,8 +263,11 @@ void CRepeater::Actions(const Steps& pStep)
     case REPEATER:
     {
       _log->Message("Repeater");
-      if (_CD) _audio->SetVolume(0,1.0);
-      else _audio->SetVolume(0,0.0);
+      _lastCD = _CD;
+      if (_CD)
+        _audio->SetVolume(0,1.0);
+      else 
+        _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,0.0);
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       _TOT_Counter = 0;
@@ -273,7 +276,6 @@ void CRepeater::Actions(const Steps& pStep)
     case ANNONCE_FIN:
     {
       _log->Message("Annonce Fin");
-      _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       _audio->Play(_end_message);
@@ -326,6 +328,10 @@ void CRepeater::OnUpdate()
           _TOT_Counter = 0;
           _antiBounce = 2;
         } 
+      }
+      else
+      {
+        _audio->SetVolume(0,0.0);
       }
       _lastCD = _CD;
     }
