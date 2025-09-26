@@ -31,7 +31,8 @@
           <h2>RSSI LEVEL</h2>
         </div>
         <div class="w3-twothird">
-          <h2 id="RSSI">0 dBm</h2>
+          <label id="RSSIValue">0 dBm</label>
+		  <meter id="RSSIJauge" value="-65" min="-150" max="-50" style="width:100%;"></meter><br>
         </div>
       </div>
     </div>
@@ -43,7 +44,7 @@
         <div class="w3-twothird">
           <input type="range" min="1" max="13" value="9" class="slider2" id="SqlControl">
           <p>Value:
-            <span id="sql_value"></span></p>
+            <span id="SqlValue"></span></p>
         </div>
       </div>
     </div>

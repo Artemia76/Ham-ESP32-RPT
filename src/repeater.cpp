@@ -378,4 +378,8 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
     }
     _config.putBool("Enabled",_enabled);
   }
+  else if (pCommand == "Sql")
+  {
+	_squelch = toInt(pdata);
+  }
 }
