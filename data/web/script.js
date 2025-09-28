@@ -44,7 +44,16 @@ window.onload = (event) => {
           {
             if(xhttp.readyState == 4 && xhttp.status == 200)
             {
-              document.getElementById("RSSIValue").innerHTML = xhttp.responseText + " dBm";
+              var S = Number(xhttp.responseText);
+              if (S <= 9)
+              {
+                document.getElementById("RSSIValue").innerHTML = "S " + xhttp.responseText;
+              }
+              else
+              {
+                var plus = (S - 9) *10;
+                document.getElementById("RSSIValue").innerHTML = "S 9+" + plus.toString();
+              }
 							document.getElementById("RSSIJauge").value = xhttp.responseText;
             }
           };

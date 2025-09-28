@@ -85,6 +85,7 @@ CRepeater::CRepeater() :
   // Load Config
   _config.begin("repeater",false);
   _enabled = _config.getBool("Enabled","true");
+  _squelch = _config.getInt("Squelch",6);
 
   Actions(IDLE);
   _log->Message("OK");
@@ -157,22 +158,15 @@ void CRepeater::OnTimer1S()
     {
       if (_audio->Is1750Detected() && _CD)
       {
-        _counter ++;
-      }
-      else
-      {
-        _counter = 0;
-      }
-      if (_counter >= 1)
-      {
         Actions(START_TX);
+        _counter = 0;
       }
       break;
     }
     case START_TX:
     {
-      _counter ++;
-      if ((_counter>1) && (!_audio->Is1750Detected()))
+      //_counter ++;
+      if (!_audio->Is1750Detected() && !_CD)
       {
         Actions(ANNONCE_DEB);
       }
@@ -224,7 +218,8 @@ void CRepeater::OnTimer1S()
   _log->Message("RSSI dBm = " + String(_RSSI.dBm) +
     " RSSI S = " +String(_RSSI.S) +
     " RSSI V = " +String(_RSSI.V) +
-    " TOT Timer = " + String(_TOT_Counter),true, CLog::DEBUG);
+    " TOT Timer = " + String(_TOT_Counter) +
+    " Squelch = " + String(_squelch),true, CLog::DEBUG);
 }
 
 /*****************************************************************************/
@@ -246,13 +241,15 @@ void CRepeater::Actions(const Steps& pStep)
     }
     case START_TX:
     {
-      _log->Message("Switch to TX");
-      digitalWrite(PTT,HIGH);
+      //Wait operator release PTT and 1750 Hz
+      _log->Message("Wait CD release to TX");
       break;
     }
     case ANNONCE_DEB:
     {
       _log->Message("Annonce début");
+      // switch to TX
+      digitalWrite(PTT,HIGH);
       //mute input sound still playing welcome
       _audio->SetVolume(0,0.0);
       _audio->SetVolume(1,1.0);
@@ -380,6 +377,8 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
   }
   else if (pCommand == "Sql")
   {
-	_squelch = toInt(pdata);
+	_squelch = pData.toInt();
+  _config.putInt("Squelch", _squelch);
+  _log->Message("Squelch change to " + String(_squelch), CLog::DEBUG);
   }
 }

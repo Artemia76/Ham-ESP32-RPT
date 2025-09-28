@@ -34,7 +34,7 @@
     _player(_source,_mixerIn2,_decoder),
     _inCopier(_multiOutput, _in, 1024),
     _ctcss_copier(_mixer,_ctcss),
-    _mag_threshold(50.0),
+    _mag_threshold(30.0),
     _1750_hyst(100.0),
     _CTCSSEnabled(false),
     _audio_ok(false)

@@ -1,52 +1,52 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Administration du relais F5ZEV</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="w3.css">
-    <link rel="stylesheet" type="text/css" href="custom.css">
-    <script type="text/javascript" src="script.js" defer></script>
-  </head>
-  <body>
-    <div class="w3-container w3-orange">
-      <h1>F5ZEV - SHTSF</h1>
-      <p>ADMIN SETTINGS</p>
-    </div>
-    <div class="w3-container w3-card-4 w3-grey">
-      <div class="w3-row-padding">
-        <div class="w3-third">
-          <h2>POWER SUPPLY</h2>
-        </div>
-        <div class="w3-twothird">
-          <h2><label class="switch">
-              <input id="RepControl" type="checkbox">
-              <span class="slider round"></span>
-            </label></h2>
-        </div>
-      </div>
-    </div>
-    <div class="w3-container w3-card-4 w3-grey">
-      <div class="w3-row-padding">
-        <div class="w3-third">
-          <h2>RSSI LEVEL</h2>
-        </div>
-        <div class="w3-twothird">
-          <label id="RSSIValue">0 dBm</label>
-		  <meter id="RSSIJauge" value="-65" min="-150" max="-50" style="width:100%;"></meter><br>
-        </div>
-      </div>
-    </div>
-    <div class="w3-container w3-card-4 w3-grey">
-      <div class="w3-row-padding">
-        <div class="w3-third">
-          <h2>SQUELCH LEVEL</h2>
-        </div>
-        <div class="w3-twothird">
-          <input type="range" min="1" max="13" value="9" class="slider2" id="SqlControl">
-          <p>Value:
-            <span id="SqlValue"></span></p>
-        </div>
-      </div>
-    </div>
-  </body>
+	<head>
+		<title>Administration du relais F5ZEV</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="w3.css">
+		<link rel="stylesheet" type="text/css" href="custom.css">
+		<script type="text/javascript" src="script.js" defer></script>
+	</head>
+	<body>
+		<div class="w3-container w3-orange">
+			<h1>F5ZEV - SHTSF</h1>
+			<p>ADMIN SETTINGS</p>
+		</div>
+		<div class="w3-container w3-card-4 w3-grey">
+			<div class="w3-row-padding">
+				<div class="w3-third">
+					<h2>POWER SUPPLY</h2>
+				</div>
+				<div class="w3-twothird">
+					<h2><label class="switch">
+						<input id="RepControl" type="checkbox">
+						<span class="slider round"></span>
+					</label></h2>
+				</div>
+			</div>
+		</div>
+		<div class="w3-container w3-card-4 w3-grey">
+			<div class="w3-row-padding">
+				<div class="w3-third">
+					<h2>RSSI LEVEL</h2>
+				</div>
+				<div class="w3-twothird">
+					<label id="RSSIValue">0 dBm</label>
+					<meter id="RSSIJauge" value="1" min="1" max="13" style="width:100%;"></meter><br>
+				</div>
+			</div>
+		</div>
+		<div class="w3-container w3-card-4 w3-grey">
+			<div class="w3-row-padding">
+				<div class="w3-third">
+					<h2>SQUELCH LEVEL</h2>
+				</div>
+				<div class="w3-twothird">
+					<input type="range" min="1" max="13" value="9" class="slider2" id="SqlControl">
+					<p>Value:
+						<span id="SqlValue"></span></p>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
