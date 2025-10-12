@@ -2,11 +2,13 @@
 
 var RepControl = document.getElementById('RepControl');
 var SqlControl = document.getElementById('SqlControl');
+var MagControl = document.getElementById('MagControl');
 
 window.onload = (event) => {
 	SqlControl.addEventListener('input', function()
     {
       document.getElementById("SqlValue").innerHTML = SqlControl.value;
+      document.getElementById('MagValue').innerHTML = MagControl.value;
     }
   );
 
@@ -20,6 +22,7 @@ window.onload = (event) => {
       const json = JSON.parse(this.responseText);
       RepControl.checked = json.state;
       SqlControl.value = json.squelch;
+      MagConreol.value = json.mag;
       RepControl.addEventListener('change', function()
         {
           var xhttp = new XMLHttpRequest();
@@ -36,6 +39,14 @@ window.onload = (event) => {
 					xhttp.send("Sql=" + String(this.value));
 				}
 			);
+      MagControl.addEventListener('change', function()
+        {
+					var xhttp = new XMLHttpRequest();
+					xhttp.open("POST", "set", true);
+					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+					xhttp.send("Mag=" + String(this.value));
+				}
+      );
       setInterval(function getData()
         {
           var xhttp = new XMLHttpRequest();

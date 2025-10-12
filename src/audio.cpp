@@ -123,6 +123,10 @@
       _log->Message("Failed : Unable to set mixer");
       return;
     }
+
+    // Load Config
+    _config.begin("audio",false);
+    _mag_threshold = _config.getFloat("MagThreshold",30);
     _audio_ok = true;
     _log->Message("OK");
 }
@@ -210,6 +214,8 @@ bool CAudio::IsPlaying()
   return _player.isActive();
 }
 
+/*****************************************************************************/
+
 void CAudio::OnUpdate()
 {
     if (!_audio_ok) return;
@@ -222,4 +228,21 @@ void CAudio::OnUpdate()
     {
       _mixer.flushMixer();
     }
+}
+
+/*****************************************************************************/
+
+float CAudio::Get1750Threshold()
+{
+  return _mag_threshold;
+}
+
+/*****************************************************************************/
+
+void CAudio::Set1750Threshold(const float& pThreshold)
+{
+  _mag_threshold = pThreshold;
+  if (_mag_threshold<0.0) _mag_threshold = 0.0;
+  if (_mag_threshold>100.0) _mag_threshold = 100.0;
+  _config.putFloat("MagThreshold",_mag_threshold);
 }
