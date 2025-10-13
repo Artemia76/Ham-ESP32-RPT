@@ -33,7 +33,7 @@ CRepeater::CRepeater() :
     _currentState(HIGH),
     _switch(true),
     _CD(false),
-    _antiBounce(0),
+    _playingRogerBeep(false),
     _TOT(180),
     _TOT_Counter(0),
     _HalfSecondBlink(false),
@@ -209,12 +209,7 @@ void CRepeater::OnTimer1S()
       }
     }
   }
-  //Reset _antiBounce
-  if (_antiBounce > 0)
-  {
-    _antiBounce--;
-    if (_antiBounce==0) _audio->SetVolume(1,0.0);
-  }
+
   _log->Message("RSSI dBm = " + String(_RSSI.dBm) +
     " RSSI S = " +String(_RSSI.S) +
     " RSSI V = " +String(_RSSI.V) +
@@ -234,7 +229,6 @@ void CRepeater::Actions(const Steps& pStep)
     {
       _log->Message("IDLE");
       _audio->SetVolume(0,0.0);
-      _audio->SetVolume(1,0.0);
       _audio->SetVolume(2,0.0);
       digitalWrite(PTT,LOW);
       break;
@@ -247,12 +241,11 @@ void CRepeater::Actions(const Steps& pStep)
     }
     case ANNONCE_DEB:
     {
-      _log->Message("Annonce début");
+      _log->Message("Start Message");
       // switch to TX
       digitalWrite(PTT,HIGH);
       //mute input sound still playing welcome
       _audio->SetVolume(0,0.0);
-      _audio->SetVolume(1,1.0);
       if ( _audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       _audio->Play(_start_message);
       break;
@@ -260,21 +253,20 @@ void CRepeater::Actions(const Steps& pStep)
     case REPEATER:
     {
       _log->Message("Repeater");
-      _lastCD = _CD;
-      if (_CD)
-        _audio->SetVolume(0,1.0);
-      else 
-        _audio->SetVolume(0,0.0);
-      _audio->SetVolume(1,0.0);
+      _lastCD = !_CD;
+      // if CTCSS used, activating the oscillator synthetizer
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       _TOT_Counter = 0;
       break;
     }
     case ANNONCE_FIN:
     {
-      _log->Message("Annonce Fin");
-      _audio->SetVolume(1,1.0);
+      _log->Message("End Message");
+      // Mute repeater
+      _audio->SetVolume(0,0.0);
+      // If CTCSS is enabled, we enable the osc synth
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
+      // Play the end message
       _audio->Play(_end_message);
       break;
     }
@@ -293,42 +285,41 @@ void CRepeater::OnUpdate()
 {
   if (_enabled)
   {
+    // Manual trig Repeater through button
     _currentState = digitalRead(ANNONCE_BTN);
     if (_lastState == LOW && _currentState == HIGH)
     {
       Actions(START_TX);
     }
     _lastState = _currentState;
+    
     // Read RSSI and if threshold, play a K
     if (_ina219_ok)
       _RSSI = _rssi2signal.getByVoltage(_ina219.getBusVoltage());
 
+    // Carriage Detect Management
     _CD = (_RSSI.S >= _squelch);
     if (_CD != _lastCD)
     {
+      // only work when repeater active
       if (_step == REPEATER)
       {
+        // If lose Carriage , enable repeating else mute the input
         if (!_CD)
         {
           _audio->SetVolume(0,0.0);
+          _TOT_Counter = 0;
         }
         else
         {
           _audio->SetVolume(0,1.0);
         }
+
         // If we loose carriage and we are in repeater mode, play RogerBeep
-        // _antiBouce is to avoid bounce CD detection
-        if ((!_CD) && (_antiBounce==0))
+        if (!_CD && !_audio->IsPlaying())
         {
-          _audio->SetVolume(1,1.0);
           _audio->Play(_beep);
-          _TOT_Counter = 0;
-          _antiBounce = 2;
-        } 
-      }
-      else
-      {
-        _audio->SetVolume(0,0.0);
+        }
       }
       _lastCD = _CD;
     }

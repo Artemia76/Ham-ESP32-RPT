@@ -37,7 +37,8 @@
     _mag_threshold(30.0),
     _1750_hyst(100.0),
     _CTCSSEnabled(false),
-    _audio_ok(false)
+    _audio_ok(false),
+    _playing(false)
     
 {
     _log = CLog::Create();
@@ -205,6 +206,8 @@ void CAudio::Play(const String& pSound)
   if (!_audio_ok) return;
   _player.setPath(String("/wav/" + pSound).c_str());
   _player.setAutoNext(false);
+  SetVolume(1,1.0);
+  _playing = true;
 }
 
 /*****************************************************************************/
@@ -219,6 +222,12 @@ bool CAudio::IsPlaying()
 void CAudio::OnUpdate()
 {
     if (!_audio_ok) return;
+    //Check if player finished
+    if (_playing && !IsPlaying())
+    {
+      SetVolume(1,0.0);
+      _playing=false;
+    }
     // Audio Processing
     _inCopier.copy();
     _player.copy();

@@ -130,7 +130,7 @@ private:
     bool _lastCD;
     bool _CD;
     bool _enabled;
-    int _antiBounce;
+    bool _playingRogerBeep;
     int _squelch;
     bool _HalfSecondBlink;
     bool _ina219_ok;
