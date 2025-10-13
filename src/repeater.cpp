@@ -38,7 +38,7 @@ CRepeater::CRepeater() :
     _TOT_Counter(0),
     _HalfSecondBlink(false),
     _enabled(true),
-    _squelch(9),
+    _squelch(6),
     _ina219(0x40),
     _ina219_ok(false),
     _start_message("louise2.wav"),
@@ -353,6 +353,7 @@ String CRepeater::onGet(const String& pCommand, const String& pData)
     json["state"] =  _enabled;
     json["squelch"] = _squelch;
     json["tot"] = _TOT;
+    json["mag"] = _audio->Get1750Threshold();
     serializeJson(json, Result);
   }
   return Result;
@@ -377,8 +378,13 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
   }
   else if (pCommand == "Sql")
   {
-	_squelch = pData.toInt();
-  _config.putInt("Squelch", _squelch);
-  _log->Message("Squelch change to " + String(_squelch), CLog::DEBUG);
+    _squelch = pData.toInt();
+    _config.putInt("Squelch", _squelch);
+    _log->Message("Squelch change to " + String(_squelch), CLog::DEBUG);
+  }
+  else if (pCommand == "Mag")
+  {
+    _audio->Set1750Threshold(pData.toFloat());
+    _log->Message("1750 Detection Magnitude change to " + String(_audio->Get1750Threshold()), CLog::DEBUG);
   }
 }

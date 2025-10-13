@@ -24,6 +24,7 @@
 #ifndef AUDIO_HPP
 #define AUDIO_HPP
 
+#include <Preferences.h>
 #include <AudioTools.h>
 #include <AudioTools/AudioLibs/AudioRealFFT.h>
 #include <AudioTools/Disk/AudioSourceLittleFS.h>
@@ -97,7 +98,17 @@ public:
      */
     void Play(const String& pSound);
 
+    /**
+     * @brief Return the wav player status
+     * 
+     * @return true if currently playing Wav
+     * @return false if player is idle
+     */
     bool IsPlaying ();
+
+    float Get1750Threshold();
+
+    void Set1750Threshold(const float& pThreshold);
 
 protected:
 
@@ -128,6 +139,7 @@ private:
     AudioPlayer _player;
     StreamCopy _inCopier;
     StreamCopy _ctcss_copier;
+    Preferences _config;
 
     bool _CTCSSEnabled;
     bool _audio_ok;

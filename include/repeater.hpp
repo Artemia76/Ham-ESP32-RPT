@@ -49,45 +49,46 @@
  */
 enum Steps
 {
-  IDLE,
-  START_TX,
-  ANNONCE_DEB,
-  REPEATER,
-  ANNONCE_FIN,
-  END_TX
+    IDLE,
+    START_TX,
+    ANNONCE_DEB,
+    REPEATER,
+    ANNONCE_FIN,
+    END_TX
 };
 
 class CRepeater : public CSingleTon<CRepeater>, CAppEvent, CWebServerEvent
 {
-  friend class CSingleTon<CRepeater>;
+    friend class CSingleTon<CRepeater>;
 public:
+
     void Actions (const Steps& pStep);
 
 protected:
 
-  /**
-  * @brief Event from web server on GET command
-  * 
-  * @param pCommand 
-  * @return String 
-  */
-  String onGet(const String& pCommand, const String& pData);
+    /**
+    * @brief Event from web server on GET command
+    * 
+    * @param pCommand 
+    * @return String 
+    */
+    String onGet(const String& pCommand, const String& pData);
 
-  /**
-  * @brief Event from web server on POST command
-  * 
-  * @param pCommand 
-  * @param pData 
-  */
-  void onSet(const String& pCommand, const String& pData);
+    /**
+    * @brief Event from web server on POST command
+    * 
+    * @param pCommand 
+    * @param pData 
+    */
+    void onSet(const String& pCommand, const String& pData);
   
-  /**
-   * @brief Background Update event 
-   * 
-   */
-  void OnUpdate();
+    /**
+     * @brief Background Update event 
+     * 
+     */
+    void OnUpdate();
 
-  private:
+private:
     /**
      * @brief Construct a new CRepeater object
      * 
@@ -143,7 +144,6 @@ protected:
     static void OnTimer500msCB ();
     void OnTimer1S ();
     void OnTimer500ms ();
-
 };
 
  #endif
