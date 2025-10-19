@@ -5,12 +5,15 @@ var SqlControl = document.getElementById('SqlControl');
 var MagControl = document.getElementById('MagControl');
 
 window.onload = (event) => {
-	SqlControl.addEventListener('input', function()
+	  SqlControl.addEventListener('input', function()
     {
       document.getElementById("SqlValue").innerHTML = SqlControl.value;
+    });
+    
+    MagControl.addEventListener('input', function()
+    {
       document.getElementById('MagValue').innerHTML = MagControl.value;
-    }
-  );
+    });
 
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST","get", true);
