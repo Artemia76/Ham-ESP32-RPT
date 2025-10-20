@@ -37,7 +37,8 @@
     _mag_threshold(30.0),
     _1750_hyst(100.0),
     _CTCSSEnabled(false),
-    _audio_ok(false)
+    _audio_ok(false),
+    _is_playing(false)
     
 {
     _log = CLog::Create();
@@ -124,6 +125,7 @@
       return;
     }
 
+    SetVolume(1,0.0);
     // Load Config
     _config.begin("audio",false);
     _mag_threshold = _config.getFloat("MagThreshold",30);
@@ -202,7 +204,9 @@ void CAudio::SetVolume(int pChannel, float pValue)
 
 void CAudio::Play(const String& pSound)
 {
-  if (!_audio_ok) return;
+  if ((!_audio_ok) || (_is_playing));
+  _is_playing = true;
+  SetVolume(1,1.0);
   _player.setPath(String("/wav/" + pSound).c_str());
   _player.setAutoNext(false);
 }
@@ -219,6 +223,12 @@ bool CAudio::IsPlaying()
 void CAudio::OnUpdate()
 {
     if (!_audio_ok) return;
+    if (_is_playing && !IsPlaying())
+    {
+      _is_playing = false;
+      SetVolume(1,0.0);
+    }
+ 
     // Audio Processing
     _inCopier.copy();
     _player.copy();
