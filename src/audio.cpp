@@ -210,7 +210,7 @@ void CAudio::Play(const String& pSound)
   _player.setPath(String("/wav/" + pSound).c_str());
   _player.setAutoNext(false);
   SetVolume(1,1.0);
-  _playing = true;
+  _is_playing = true;
 }
 
 /*****************************************************************************/
