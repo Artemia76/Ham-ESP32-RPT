@@ -253,8 +253,11 @@ void CRepeater::Actions(const Steps& pStep)
     case REPEATER:
     {
       _log->Message("Repeater");
-      _lastCD = !_CD;
-      // if CTCSS used, activating the oscillator synthetizer
+      _lastCD = _CD;
+      if (_CD)
+        _audio->SetVolume(0,1.0);
+      else 
+        _audio->SetVolume(0,0.0);
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       _TOT_Counter = 0;
       break;

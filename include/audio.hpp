@@ -145,7 +145,7 @@ private:
     bool _audio_ok;
     float _mag_threshold;
     float _1750_hyst;
-    bool _playing;
+    bool _is_playing;
     std::map <String, File> _catalog;
     static void fftResultCB (AudioFFTBase &fft);
     void fftResult(AudioFFTBase &fft);
