@@ -45,18 +45,18 @@
     _log->Message("Starting Audio... ",false);
     
     //
-    // Configure in stream
+    // Configure I2S stream input
     //
-    auto configin = _in.defaultConfig(RX_MODE);
-    configin.copyFrom(_info);
-    configin.i2s_format = I2S_STD_FORMAT;
-    configin.is_master = true;
-    configin.port_no = 0;
-    configin.pin_ws = AD_LRCK;                        // LRCK
-    configin.pin_bck = AD_SCLK;                       // SCLK
-    configin.pin_data = AD_SDIN;                      // SDOUT
-    configin.pin_mck = AD_MCLK;
-    if (!_in.begin(configin))
+    auto configin = _in.defaultConfig(RX_MODE); // Create audio stream input config
+    configin.copyFrom(_info); // Get default audio parameters
+    configin.i2s_format = I2S_STD_FORMAT; // Standard I2S format
+    configin.is_master = true; // ESP32 is I2S master
+    configin.port_no = 0; // I2S first channel
+    configin.pin_ws = AD_LRCK; // LRCK
+    configin.pin_bck = AD_SCLK; // SCLK
+    configin.pin_data = AD_SDIN; // SDOUT
+    configin.pin_mck = AD_MCLK; // MCLK
+        if (!_in.begin(configin))
     {
       _log->Message("Failed : Unable to found I2S ADC");
       return;
@@ -65,15 +65,15 @@
     //
     // Configure out stream
     //
-    auto configout = _out.defaultConfig(TX_MODE);
-    configout.copyFrom(_info);
-    configout.i2s_format = I2S_STD_FORMAT;
-    configout.is_master = true;
-    configout.port_no = 1;
-    configout.pin_ws = DA_LRCK;                        // LRCK
-    configout.pin_bck = DA_SCLK;                       // SCLK
-    configout.pin_data = DA_SDIN;                      // SDOUT
-    configout.pin_mck = DA_MCLK;
+    auto configout = _out.defaultConfig(TX_MODE); // Create audio stream output config
+    configout.copyFrom(_info); // Get default audio parameters
+    configout.i2s_format = I2S_STD_FORMAT; // Standard I2S format
+    configout.is_master = true; // ESP32 is I2S master
+    configout.port_no = 1; // I2S first channel
+    configout.pin_ws = DA_LRCK; // LRCK
+    configout.pin_bck = DA_SCLK; // SCLK
+    configout.pin_data = DA_SDIN; // SDOUT
+    configout.pin_mck = DA_MCLK; // MCLK
     if (!_out.begin(configout))
     {
       _log->Message("Failed : Unable to found I2S DAC");
@@ -81,7 +81,7 @@
     }
 
     //
-    // Configure FFT
+    // Configure Fourrier Fast Transform
     //
     auto tcfg = _fft.defaultConfig();
     tcfg.copyFrom(_info);
@@ -125,10 +125,10 @@
       return;
     }
 
-    SetVolume(1,0.0);
+    SetVolume(1,0.0); // Set mixer volume for stream input to 0.0
     // Load Config
     _config.begin("audio",false);
-    _mag_threshold = _config.getFloat("MagThreshold",30);
+    _mag_threshold = _config.getFloat("MagThreshold",30); // Loading saved magnitude threshold
     _audio_ok = true;
     _log->Message("OK");
 }
@@ -139,8 +139,10 @@ bool CAudio::Is1750Detected ()
 {
   if (!_audio_ok) return false;
 
-  // Si il n'y a pas assez de données dans le buffer on passe
+  // If there is not enough data in buffer, return false
   if (_FFTBuf.size() <5 ) return false;
+
+  // Parsing FFT buffer to detect 1750 Hz tone
   using index_t = decltype(_FFTBuf)::index_t;
 	for (index_t i = 0; i < _FFTBuf.size(); i++)
   {
@@ -160,6 +162,7 @@ bool CAudio::Is1750Detected ()
 
 void CAudio::fftResultCB(AudioFFTBase &fft)
 {
+  // Call the signleton instance to handle the FFT result
   CAudio::Create()->fftResult(fft);
 }
 
@@ -180,6 +183,7 @@ void CAudio::fftResult(AudioFFTBase &fft)
       TopScore.magnitude = Line.magnitude;
     }
   }
+  // Fill FFT Circular Buffer with new result
   _FFTBuf.push(TopScore);
 }
 
@@ -235,7 +239,7 @@ void CAudio::OnUpdate()
     _inCopier.copy();
     _player.copy();
     _ctcss_copier.copy();
-    //_wavCopier.copy();
+
     if (_mixer.size() > 0)
     {
       _mixer.flushMixer();

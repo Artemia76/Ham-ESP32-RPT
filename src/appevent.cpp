@@ -25,13 +25,13 @@
 
  CAppEvent::CAppEvent ()
  {
-    _app = CApp::Create();
-    _app->_subscribe(this);
+    _app = CApp::Create(); // Get the main app signleton instance
+    _app->_subscribe(this); // Subscribe to main loop event from main app singleton
  }
 
 /*****************************************************************************/
 
  CAppEvent::~CAppEvent ()
  {
-    _app->_unSubscribe(this);
+    _app->_unSubscribe(this); // Unsubscribe from main loop event from main app singleton
  }

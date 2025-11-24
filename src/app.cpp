@@ -27,7 +27,7 @@
 
 CApp::CApp ()
 {
-  _log = CLog::Create();
+  _log = CLog::Create(); // Get Log singleton
   _log->Message("Starting Application... OK");
 }
 
@@ -42,11 +42,11 @@ CApp::~CApp ()
 
 void CApp::Loop ()
 {
-  for (auto Subcriber : _subscribers)
+  for (auto Subscriber : _subscribers) //Call main loop for each subscriber
   {
-      if (Subcriber != nullptr)
+      if (Subscriber != nullptr) // Be sure Subscriber is not null to avoid crash
       {
-          Subcriber->OnUpdate();
+          Subscriber->OnUpdate(); // Call the virtual OnUpdate method of subscriber
       }
   }
 }
@@ -55,6 +55,8 @@ void CApp::Loop ()
 
 void CApp::_subscribe(CAppEvent* pSubscriber)
 {
+    // Ensure subscriber is not already in the list to avoid duplicates
+    // Then add it
     if (std::find(_subscribers.begin(), _subscribers.end(),pSubscriber) == _subscribers.end())
     {
         _subscribers.push_back(pSubscriber);
@@ -65,5 +67,6 @@ void CApp::_subscribe(CAppEvent* pSubscriber)
 
 void CApp::_unSubscribe(CAppEvent* pSubscriber)
 {
+    // Remove subscriber from the list if exists
     _subscribers.erase(std::remove(_subscribers.begin(), _subscribers.end(), pSubscriber), _subscribers.end());
 }
