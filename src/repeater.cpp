@@ -381,4 +381,9 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
     _audio->Set1750Threshold(pData.toFloat());
     _log->Message("1750 Detection Magnitude change to " + String(_audio->Get1750Threshold()), CLog::DEBUG);
   }
+  else if (pCommand == "TOT")
+  {
+    _TOT = pData.toInt();
+    _log->Message("TOT change to " + String(_TOT) + " seconds", CLog::DEBUG);
+  }
 }

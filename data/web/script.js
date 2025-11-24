@@ -3,6 +3,7 @@
 var RepControl = document.getElementById('RepControl');
 var SqlControl = document.getElementById('SqlControl');
 var MagControl = document.getElementById('MagControl');
+var TOTControl = document.getElementById('TOTControl');
 
 window.onload = (event) => {
 	  SqlControl.addEventListener('input', function()
@@ -15,6 +16,11 @@ window.onload = (event) => {
       document.getElementById('MagValue').innerHTML = MagControl.value;
     });
 
+    TOTControl.addEventListener('input', function()
+    {
+      document.getElementById('TOTValue').innerHTML = TOTControl.value;
+    });
+
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST","get", true);
   xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -25,7 +31,8 @@ window.onload = (event) => {
       const json = JSON.parse(this.responseText);
       RepControl.checked = json.state;
       SqlControl.value = json.squelch;
-      MagConreol.value = json.mag;
+      MagControl.value = json.mag;
+      TOTControl.value = json.tot;
       RepControl.addEventListener('change', function()
         {
           var xhttp = new XMLHttpRequest();
@@ -48,6 +55,14 @@ window.onload = (event) => {
 					xhttp.open("POST", "set", true);
 					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 					xhttp.send("Mag=" + String(this.value));
+				}
+      );
+      TOTControl.addEventListener('change', function()
+        {
+					var xhttp = new XMLHttpRequest();
+					xhttp.open("POST", "set", true);
+					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+					xhttp.send("TOT=" + String(this.value));
 				}
       );
       setInterval(function getData()
