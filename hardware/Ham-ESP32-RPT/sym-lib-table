@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "esp32-s3-devkitc-v2")(type "KiCad")(uri "${KIPRJMOD}/esp32-s3-devkitc-v2.kicad_sym")(options "")(descr ""))
+  (lib (name "Ham-ESP32-RPT")(type "KiCad")(uri "${KIPRJMOD}/Ham-ESP32-RPT.kicad_sym")(options "")(descr ""))
+)

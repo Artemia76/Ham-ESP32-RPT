@@ -218,7 +218,13 @@
       "mfg": "",
       "mpn": ""
     },
-    "layer_pairs": [],
+    "layer_pairs": [
+      {
+        "bottomLayer": 2,
+        "enabled": true,
+        "topLayer": 0
+      }
+    ],
     "layer_presets": [],
     "viewports": []
   },
@@ -450,7 +456,9 @@
   },
   "libraries": {
     "pinned_footprint_libs": [],
-    "pinned_symbol_libs": []
+    "pinned_symbol_libs": [
+      "Ham-ESP32-RPT"
+    ]
   },
   "meta": {
     "filename": "Ham-ESP32-RPT.kicad_pro",
