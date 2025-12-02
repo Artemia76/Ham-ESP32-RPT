@@ -86,6 +86,7 @@ CRepeater::CRepeater() :
   _config.begin("repeater",false);
   _enabled = _config.getBool("Enabled","true");
   _squelch = _config.getInt("Squelch",6);
+  _TOT = _config.getInt("TOT",180);
 
   Actions(IDLE);
   _log->Message("OK");
@@ -384,6 +385,7 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
   else if (pCommand == "TOT")
   {
     _TOT = pData.toInt();
+    _config.putInt("TOT", _TOT);
     _log->Message("TOT change to " + String(_TOT) + " seconds", CLog::DEBUG);
   }
 }

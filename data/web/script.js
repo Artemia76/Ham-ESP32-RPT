@@ -1,8 +1,11 @@
 'use strict';
 
 var RepControl = document.getElementById('RepControl');
+var SqlValue = document.getElementById('SqlValue');
 var SqlControl = document.getElementById('SqlControl');
+var MagValue = document.getElementById('MagValue');
 var MagControl = document.getElementById('MagControl');
+var TOTValue = document.getElementById('TOTValue');
 var TOTControl = document.getElementById('TOTControl');
 
 window.onload = (event) => {
@@ -31,9 +34,12 @@ window.onload = (event) => {
       const json = JSON.parse(this.responseText);
       RepControl.checked = json.state;
       SqlControl.value = json.squelch;
+      SqlValue.innerHTML = json.squelch;
       MagControl.value = json.mag;
+      MagValue.innerHTML = json.mag;
       TOTControl.value = json.tot;
-      RepControl.addEventListener('change', function()
+      TOTValue.innerHTML = json.tot;
+      RepControl.addEventListener('mo', function()
         {
           var xhttp = new XMLHttpRequest();
           xhttp.open("POST", "set", true);
