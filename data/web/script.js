@@ -39,7 +39,7 @@ window.onload = (event) => {
       MagValue.innerHTML = json.mag;
       TOTControl.value = json.tot;
       TOTValue.innerHTML = json.tot;
-      RepControl.addEventListener('mo', function()
+      RepControl.addEventListener('change', function()
         {
           var xhttp = new XMLHttpRequest();
           xhttp.open("POST", "set", true);
@@ -47,7 +47,7 @@ window.onload = (event) => {
           xhttp.send("Rep=" + String(this.checked));
         }
       );
-			SqlControl.addEventListener('change', function()
+			SqlControl.addEventListener('mouseup', function()
 				{
 					var xhttp = new XMLHttpRequest();
 					xhttp.open("POST", "set", true);
@@ -55,7 +55,7 @@ window.onload = (event) => {
 					xhttp.send("Sql=" + String(this.value));
 				}
 			);
-      MagControl.addEventListener('change', function()
+      MagControl.addEventListener('mouseup', function()
         {
 					var xhttp = new XMLHttpRequest();
 					xhttp.open("POST", "set", true);
@@ -63,7 +63,7 @@ window.onload = (event) => {
 					xhttp.send("Mag=" + String(this.value));
 				}
       );
-      TOTControl.addEventListener('change', function()
+      TOTControl.addEventListener('mouseup', function()
         {
 					var xhttp = new XMLHttpRequest();
 					xhttp.open("POST", "set", true);

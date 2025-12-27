@@ -72,7 +72,7 @@ protected:
     * @param pCommand 
     * @return String 
     */
-    String onGet(const String& pCommand, const String& pData);
+    String onGet(const String& pKey, const String& pParam);
 
     /**
     * @brief Event from web server on POST command
@@ -80,7 +80,7 @@ protected:
     * @param pCommand 
     * @param pData 
     */
-    void onSet(const String& pCommand, const String& pData);
+    void onSet(const String& pKey, const String& pParam);
   
     /**
      * @brief Background Update event 

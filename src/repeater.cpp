@@ -215,7 +215,7 @@ void CRepeater::OnTimer1S()
     " RSSI S = " +String(_RSSI.S) +
     " RSSI V = " +String(_RSSI.V) +
     " TOT Timer = " + String(_TOT_Counter) +
-    " Squelch = " + String(_squelch),true, CLog::DEBUG);
+    " Squelch = " + String(_squelch),true, CLog::VERBOSE);
 }
 
 /*****************************************************************************/
@@ -335,14 +335,14 @@ void CRepeater::OnUpdate()
 
 /*****************************************************************************/
 
-String CRepeater::onGet(const String& pCommand, const String& pData)
+String CRepeater::onGet(const String& pKey, const String& pParam)
 {
   String Result = "";
-  if (pCommand == "RSSI")
+  if (pKey == "RSSI")
   {
     Result = String(_RSSI.S);
   }
-  else if (pCommand == "Config")
+  else if (pKey == "Config")
   {
     JsonDocument json;
     json["state"] =  _enabled;
@@ -356,35 +356,35 @@ String CRepeater::onGet(const String& pCommand, const String& pData)
 
 /*****************************************************************************/
 
-void CRepeater::onSet(const String& pCommand, const String& pData)
+void CRepeater::onSet(const String& pKey, const String& pParam)
 {
-  if (pCommand == "Rep")
+  if (pKey == "Rep")
   {
-    if (pData == "true")
+    if (pParam == "true")
     {
       _enabled=true;
     }
-    else if (pData == "false")
+    else if (pParam == "false")
     {
       _enabled=false;
       Actions(IDLE);
     }
     _config.putBool("Enabled",_enabled);
   }
-  else if (pCommand == "Sql")
+  else if (pKey == "Sql")
   {
-    _squelch = pData.toInt();
+    _squelch = pParam.toInt();
     _config.putInt("Squelch", _squelch);
     _log->Message("Squelch change to " + String(_squelch), CLog::DEBUG);
   }
-  else if (pCommand == "Mag")
+  else if (pKey == "Mag")
   {
-    _audio->Set1750Threshold(pData.toFloat());
+    _audio->Set1750Threshold(pParam.toFloat());
     _log->Message("1750 Detection Magnitude change to " + String(_audio->Get1750Threshold()), CLog::DEBUG);
   }
-  else if (pCommand == "TOT")
+  else if (pKey == "TOT")
   {
-    _TOT = pData.toInt();
+    _TOT = pParam.toInt();
     _config.putInt("TOT", _TOT);
     _log->Message("TOT change to " + String(_TOT) + " seconds", CLog::DEBUG);
   }
