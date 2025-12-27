@@ -28,6 +28,7 @@
 #include <vector>
 //#include <regex>
 #include <AsyncTimer.h>
+#include <WiFi.h>
 
 #include "appevent.hpp"
 #include "webserverevent.hpp"
@@ -61,8 +62,11 @@ protected:
     */
     void OnUpdate();
 
-private:
+static void WiFiEventCB(WiFiEvent_t event);
+    void WiFiEvent(WiFiEvent_t event);
 
+private:
+    int _counter;
     /**
      * @brief Construct a new CWebServer object
      * 

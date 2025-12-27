@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <LittleFS.h>
 #include <AsyncTCP.h>
-#include <WiFi.h>
 
 #include "webserver.hpp"
 #include "env.hpp"
@@ -33,7 +32,8 @@ CWebServer::CWebServer () :
     _server (80),
     _ssid (WIFI_SSID),
     _password (WIFI_PASSWORD),
-    _initialized(false)
+    _initialized(false),
+    _counter(0)
 {
     _log = CLog::Create();
     _log->Message ("Starting WebServer... ");
@@ -53,27 +53,11 @@ CWebServer::CWebServer () :
         file.close();
         file = root.openNextFile();
     }
-
+    //Start WiFI
+    WiFi.mode(WIFI_STA);
+    WiFi.enableIPv6();
+    WiFi.onEvent(CWebServer::WiFiEventCB);
     WiFi.begin(_ssid, _password);
-    _log->Message ("Connecting to " + String(_ssid));
-
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        _log->Message (".", false);
-        delay(500);
-        cnt++;
-        if (cnt > 10)
-        {
-            _log->Message("Failed to connect WiFi");
-            return;
-        }
-    }
-
-    // Print local IP address and start web server
-    _log->Message ("\n");
-    _log->Message ("WiFi connected.");
-    _log->Message ("IP address: " + WiFi.localIP().toString());
-    _log->Message ("Wifi Channel: " + String(WiFi.channel()));
 
     //--------------------------------------------SERVER
     _server.on("/",HTTP_GET, [](AsyncWebServerRequest *request)
@@ -101,15 +85,15 @@ CWebServer::CWebServer () :
         if (request->params() < 1) return;
         String Key = request->getParam(0)->name();
         String Param = request->getParam(0)->value();
-        _log->Message ("Received get Key = " + Key + " : Value = " + Param, CLog::DEBUG);
+        _log->Message ("Received get Key = " + Key + " : Param = " + Param, CLog::DEBUG);
         for (auto Subcriber : _subscribers)
         {
             if (Subcriber != nullptr)
             {
-                String Value = Subcriber->onGet(Key, Param);
-                if (!Value.isEmpty())
+                String Result = Subcriber->onGet(Key, Param);
+                if (!Result.isEmpty())
                 {
-                    request->send(200,"text/plain", Value); 
+                    request->send(200,"text/plain", Result); 
                     return;
                 }
             }
@@ -122,7 +106,7 @@ CWebServer::CWebServer () :
         if (request->params() < 1) return;
         String Key = request->getParam(0)->name();
         String Param = request->getParam(0)->value();
-        _log->Message ("Received set Key = " + Key + " : Value = " + Param, CLog::DEBUG);
+        _log->Message ("Received set Key = " + Key + " : Param = " + Param, CLog::DEBUG);
         for (auto Subcriber : _subscribers)
         {
             if (Subcriber != nullptr)
@@ -132,7 +116,6 @@ CWebServer::CWebServer () :
         }
         request->send(200);
     });
-    _server.begin();
 
     //
     // Setting Slow Timer
@@ -140,7 +123,6 @@ CWebServer::CWebServer () :
     _t1s.setInterval(CWebServer::OnTimer1SCB,1000);
 
     _initialized = true;
-    _log->Message ("Server Online.");
 }
 
 /*****************************************************************************/
@@ -167,6 +149,52 @@ void CWebServer::_unSubscribe(CWebServerEvent* pSubscriber)
     _subscribers.erase(std::remove(_subscribers.begin(), _subscribers.end(), pSubscriber), _subscribers.end());
 }
 
+void CWebServer::WiFiEventCB(WiFiEvent_t event)
+{
+  CWebServer::Create()->WiFiEvent(event);
+}
+
+void CWebServer::WiFiEvent(WiFiEvent_t event)
+{
+    _log->Message(String(_counter) + ": ", false);
+    _counter++;
+    switch (event) 
+    {
+        case ARDUINO_EVENT_WIFI_STA_START:
+        {
+            _log->Message ("WiFi STA Started");
+            break;
+        }
+        case ARDUINO_EVENT_WIFI_STA_CONNECTED:
+        {
+            _log->Message ("WiFi Connected to SSID: " + String(WiFi.SSID()));
+            _server.begin();
+            _log->Message ("Server Online.");
+            break;
+        }
+        case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+        {
+            IPAddress ip = WiFi.localIP();
+            _log->Message ("IP address assigned: " + ip.toString());
+            break;
+        }
+        case ARDUINO_EVENT_WIFI_STA_GOT_IP6:
+        {
+            IPAddress ipv6 = WiFi.STA.globalIPv6();
+            _log->Message ("Global IPV6 address assigned: " + ipv6.toString());
+            break;
+        }
+        case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+        {
+            _log->Message ("WiFi Disconnected from SSID: " + String(WiFi.SSID()));
+            _server.end();
+            WiFi.reconnect();
+            break;
+        }
+        default:
+            break;
+    }
+}
 /*****************************************************************************/
 
 void CWebServer::OnTimer1SCB()

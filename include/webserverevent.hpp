@@ -62,14 +62,14 @@ protected:
      * @param pData 
      * @return String 
      */
-virtual String onGet(const String& pCommand, const String& pData)=0;
+virtual String onGet(const String& pKey, const String& pParam)=0;
 
     /**
      * @brief Process POST HTTP "Set" CommandEvent Callback
      * 
      * @param pCommand // #define DEBUG
      */
-virtual void onSet(const String& pCommand, const String& pData)=0;
+virtual void onSet(const String& pKey, const String& pParam)=0;
 
 private:
     /**
