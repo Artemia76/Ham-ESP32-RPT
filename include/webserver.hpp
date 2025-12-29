@@ -28,6 +28,7 @@
 #include <vector>
 //#include <regex>
 #include <AsyncTimer.h>
+#include <WiFi.h>
 
 #include "appevent.hpp"
 #include "webserverevent.hpp"
@@ -61,6 +62,15 @@ protected:
     */
     void OnUpdate();
 
+static void CB_WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info);
+    void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info);
+
+static void CB_WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
+    void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info);
+
+static void CB_WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
+    void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
+
 private:
 
     /**
@@ -89,6 +99,8 @@ private:
 
     AsyncTimer _t1s;
 
+    AsyncTimer _t30s;
+
     /**
      * @brief Log Controller
      * 
@@ -116,6 +128,8 @@ private:
     void _unSubscribe (CWebServerEvent* pSubscriber);
     void OnTimer1S ();
     static void OnTimer1SCB ();
+    void OnTimer30S ();
+    static void OnTimer30SCB ();
 };
 
 #endif //WEBSERVER_HPP

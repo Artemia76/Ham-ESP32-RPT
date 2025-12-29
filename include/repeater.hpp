@@ -127,6 +127,9 @@ private:
     RSSIData _RSSI;
     int _TOT;
     int _TOT_Counter;
+    float _StartVol;
+    float _RBVol;
+    float _EndVol;
     bool _lastCD;
     bool _CD;
     bool _enabled;

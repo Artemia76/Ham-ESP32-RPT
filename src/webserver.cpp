@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <LittleFS.h>
 #include <AsyncTCP.h>
-#include <WiFi.h>
 
 #include "webserver.hpp"
 #include "env.hpp"
@@ -54,10 +53,18 @@ CWebServer::CWebServer () :
         file = root.openNextFile();
     }
 
-    WiFi.begin(_ssid, _password);
-    _log->Message ("Connecting to " + String(_ssid));
+    // Setup Wifi
+    WiFi.disconnect(true);
+    delay (1000);
 
-    while (WiFi.status() != WL_CONNECTED)
+    WiFi.onEvent(CB_WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
+    WiFi.onEvent(CB_WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
+    WiFi.onEvent(CB_WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+
+    WiFi.begin(_ssid, _password);
+    _log->Message ("Connecting to " + String(_ssid) + " ...");
+
+    /*while (WiFi.status() != WL_CONNECTED)
     {
         _log->Message (".", false);
         delay(500);
@@ -67,13 +74,13 @@ CWebServer::CWebServer () :
             _log->Message("Failed to connect WiFi");
             return;
         }
-    }
 
     // Print local IP address and start web server
     _log->Message ("\n");
     _log->Message ("WiFi connected.");
     _log->Message ("IP address: " + WiFi.localIP().toString());
     _log->Message ("Wifi Channel: " + String(WiFi.channel()));
+    */
 
     //--------------------------------------------SERVER
     _server.on("/",HTTP_GET, [](AsyncWebServerRequest *request)
@@ -132,21 +139,63 @@ CWebServer::CWebServer () :
         }
         request->send(200);
     });
-    _server.begin();
+    //_server.begin();
 
     //
     // Setting Slow Timer
     //
     _t1s.setInterval(CWebServer::OnTimer1SCB,1000);
+    _t30s.setInterval(CWebServer::OnTimer30SCB,30000);
 
     _initialized = true;
-    _log->Message ("Server Online.");
+    //_log->Message ("Server Online.");
 }
 
 /*****************************************************************************/
 
 CWebServer::~CWebServer ()
 {
+    _server.end();
+}
+
+/*************************************************************************** */
+void CWebServer::CB_WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    CWebServer::Create()->WiFiStationConnected(event, info);
+}
+
+/*************************************************************************** */
+void CWebServer::WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    _log->Message ("WiFi connected.");
+}
+
+/*************************************************************************** */
+void CWebServer::CB_WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    CWebServer::Create()->WiFiGotIP(event, info);
+}
+
+/*************************************************************************** */
+void CWebServer::WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    _log->Message ("IP address: " + WiFi.localIP().toString());
+    _log->Message ("Wifi Channel: " + String(WiFi.channel()));
+    _log->Message ("Restarting Web Server.");
+    _server.begin();
+}
+
+/*************************************************************************** */
+void CWebServer::CB_WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    CWebServer::Create()->WiFiStationDisconnected(event, info);
+}
+
+/*************************************************************************** */
+void CWebServer::WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    _log->Message ("WiFi lost connection. Reason: "+ String(info.wifi_sta_disconnected.reason));
+    WiFi.disconnect(true);
     _server.end();
 }
 
@@ -171,7 +220,21 @@ void CWebServer::_unSubscribe(CWebServerEvent* pSubscriber)
 
 void CWebServer::OnTimer1SCB()
 {
-  CWebServer::Create()->OnTimer1S();
+    CWebServer::Create()->OnTimer1S();
+}
+
+void CWebServer::OnTimer30SCB()
+{
+    CWebServer::Create()->OnTimer30S();
+}
+
+void CWebServer::OnTimer30S()
+{
+    if (!WiFi.isConnected())
+    {
+        _log->Message ("WiFi Trying to reconnect...");
+        WiFi.begin(_ssid, _password);
+    }
 }
 
 /*****************************************************************************/
@@ -186,4 +249,5 @@ void CWebServer::OnTimer1S()
 void CWebServer::OnUpdate()
 {
     _t1s.handle();
+    _t30s.handle();
 }

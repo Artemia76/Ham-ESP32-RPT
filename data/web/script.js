@@ -7,6 +7,12 @@ var MagValue = document.getElementById('MagValue');
 var MagControl = document.getElementById('MagControl');
 var TOTValue = document.getElementById('TOTValue');
 var TOTControl = document.getElementById('TOTControl');
+var StartValue = document.getElementById('StartValue');
+var StartVolume = document.getElementById('StartVolume');
+var RBValue = document.getElementById('RBValue');
+var RBVolume = document.getElementById('RBVolume');
+var EndValue = document.getElementById('EndValue');
+var EndVolume = document.getElementById('EndVolume');
 
 window.onload = (event) => {
 	  SqlControl.addEventListener('input', function()
@@ -24,6 +30,21 @@ window.onload = (event) => {
       document.getElementById('TOTValue').innerHTML = TOTControl.value;
     });
 
+    StartVolume.addEventListener('input', function()
+    {
+      document.getElementById('StartValue').innerHTML = StartVolume.value;
+    });
+
+    RBVolume.addEventListener('input', function()
+    {
+      document.getElementById('RBValue').innerHTML = RBVolume.value;
+    });
+
+    EndVolume.addEventListener('input', function()
+    {
+      document.getElementById('EndValue').innerHTML = EndVolume.value;
+    });
+
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST","get", true);
   xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
@@ -39,6 +60,13 @@ window.onload = (event) => {
       MagValue.innerHTML = json.mag;
       TOTControl.value = json.tot;
       TOTValue.innerHTML = json.tot;
+      StartVolume.value = json.StartVol;
+      StartValue.innerHTML = json.StartVol;
+      RBVolume.Value = json.RBVol;
+      RBValue.innerHTML = json.RBVol;
+      EndVolume.value = json.EndVol;
+      EndValue.innerHTML = json.EndVol;
+
       RepControl.addEventListener('mo', function()
         {
           var xhttp = new XMLHttpRequest();
@@ -69,6 +97,30 @@ window.onload = (event) => {
 					xhttp.open("POST", "set", true);
 					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 					xhttp.send("TOT=" + String(this.value));
+				}
+      );
+      StartVolume.addEventListener('change', function()
+        {
+					var xhttp = new XMLHttpRequest();
+					xhttp.open("POST", "set", true);
+					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+					xhttp.send("StartVol=" + String(this.value));
+				}
+      );
+      RBVolume.addEventListener('change', function()
+        {
+					var xhttp = new XMLHttpRequest();
+					xhttp.open("POST", "set", true);
+					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+					xhttp.send("RBVol=" + String(this.value));
+				}
+      );
+      EndVolume.addEventListener('change', function()
+        {
+					var xhttp = new XMLHttpRequest();
+					xhttp.open("POST", "set", true);
+					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+					xhttp.send("EndVol=" + String(this.value));
 				}
       );
       setInterval(function getData()

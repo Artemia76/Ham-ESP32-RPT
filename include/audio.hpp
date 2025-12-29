@@ -96,7 +96,7 @@ public:
      * 
      * @param pSound : the sound name
      */
-    void Play(const String& pSound);
+    void Play(const String& pSound, float pVolume);
 
     /**
      * @brief Return the wav player status

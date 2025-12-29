@@ -36,6 +36,9 @@ CRepeater::CRepeater() :
     _playingRogerBeep(false),
     _TOT(180),
     _TOT_Counter(0),
+    _StartVol(1.0),
+    _RBVol(1.0),
+    _EndVol(1.0),
     _HalfSecondBlink(false),
     _enabled(true),
     _squelch(6),
@@ -87,7 +90,9 @@ CRepeater::CRepeater() :
   _enabled = _config.getBool("Enabled","true");
   _squelch = _config.getInt("Squelch",6);
   _TOT = _config.getInt("TOT",180);
-
+  _StartVol = _config.getFloat("StartVol",1.0);
+  _RBVol = _config.getFloat("RBVol",1.0);
+  _EndVol = _config.getFloat("EndVol",1.0);
   Actions(IDLE);
   _log->Message("OK");
 }
@@ -215,7 +220,7 @@ void CRepeater::OnTimer1S()
     " RSSI S = " +String(_RSSI.S) +
     " RSSI V = " +String(_RSSI.V) +
     " TOT Timer = " + String(_TOT_Counter) +
-    " Squelch = " + String(_squelch),true, CLog::DEBUG);
+    " Squelch = " + String(_squelch),true, CLog::VERBOSE);
 }
 
 /*****************************************************************************/
@@ -248,7 +253,7 @@ void CRepeater::Actions(const Steps& pStep)
       //mute input sound still playing welcome
       _audio->SetVolume(0,0.0);
       if ( _audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
-      _audio->Play(_start_message);
+      _audio->Play(_start_message, _StartVol);
       break;
     }
     case REPEATER:
@@ -271,7 +276,7 @@ void CRepeater::Actions(const Steps& pStep)
       // If CTCSS is enabled, we enable the osc synth
       if (_audio->IsCTCSSEnabled()) _audio->SetVolume(2,CTCSS_LVL);
       // Play the end message
-      _audio->Play(_end_message);
+      _audio->Play(_end_message, _EndVol);
       break;
     }
     case END_TX:
@@ -322,7 +327,7 @@ void CRepeater::OnUpdate()
         // If we loose carriage and we are in repeater mode, play RogerBeep
         if (!_CD && !_audio->IsPlaying())
         {
-          _audio->Play(_beep);
+          _audio->Play(_beep, _RBVol);
         }
       }
       _lastCD = _CD;
@@ -349,6 +354,9 @@ String CRepeater::onGet(const String& pCommand, const String& pData)
     json["squelch"] = _squelch;
     json["tot"] = _TOT;
     json["mag"] = _audio->Get1750Threshold();
+    json["StartVol"] = (int)(_StartVol*100.0);
+    json["RBVol"] = (int)(_RBVol*100.0);
+    json["EndVol"] = (int)(_EndVol*100.0);
     serializeJson(json, Result);
   }
   return Result;
@@ -387,5 +395,23 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
     _TOT = pData.toInt();
     _config.putInt("TOT", _TOT);
     _log->Message("TOT change to " + String(_TOT) + " seconds", CLog::DEBUG);
+  }
+  else if (pCommand == "StartVol")
+  {
+    _StartVol = (float)(pData.toInt())/100.0;
+    _config.putFloat("StartVol", _StartVol);
+    _log->Message("Start Announce volume change to " + String((int)(_StartVol * 100)) + " %", CLog::DEBUG);
+  }
+  else if (pCommand == "RBVol")
+  {
+    _RBVol = (float)(pData.toInt())/100.0;
+    _config.putFloat("RBVol", _RBVol);
+    _log->Message("Roger Beep volume change to " + String((int)(_RBVol * 100)) + " %", CLog::DEBUG);
+  }
+  else if (pCommand == "EndVol")
+  {
+    _EndVol = (float)(pData.toInt())/100.0;
+    _config.putFloat("EndVol", _EndVol);
+    _log->Message("End Announce volume change to " + String((int)(_EndVol * 100)) + " %", CLog::DEBUG);
   }
 }

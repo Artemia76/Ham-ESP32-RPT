@@ -201,19 +201,21 @@ void CAudio::SetVolume(int pChannel, float pValue)
   if (!_audio_ok) return;
   if ((pChannel < 0) || (pChannel > 2)) return;
   if ((pValue < 0.0) || (pValue > 1.0)) return;
+  _log->Message("Set volume = " + String(pValue));
   _mixer.setWeight(pChannel, pValue);
 }
 
 /*****************************************************************************/
 
-void CAudio::Play(const String& pSound)
+void CAudio::Play(const String& pSound, float pVolume)
 {
   if ((!_audio_ok) || (_is_playing));
   _is_playing = true;
-  SetVolume(1,1.0);
+  SetVolume(1,pVolume);
+  _player.setVolume(pVolume);
   _player.setPath(String("/wav/" + pSound).c_str());
   _player.setAutoNext(false);
-  SetVolume(1,1.0);
+  SetVolume(1,pVolume);
   _is_playing = true;
 }
 
