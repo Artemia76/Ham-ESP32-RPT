@@ -133,7 +133,7 @@ private:
     BufferedStream _mixerIn2;
     AudioRealFFT _fft;
     MultiOutput _multiOutput;
-    CircularBuffer <AudioFFTResult,5> _FFTBuf;
+    CircularBuffer <AudioFFTResult,3> _FFTBuf;
     WAVDecoder _decoder;
     AudioSourceLittleFS _source;
     AudioPlayer _player;

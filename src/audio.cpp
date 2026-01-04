@@ -140,7 +140,7 @@ bool CAudio::Is1750Detected ()
   if (!_audio_ok) return false;
 
   // If there is not enough data in buffer, return false
-  if (_FFTBuf.size() <5 ) return false;
+  if (_FFTBuf.size() <3 ) return false;
 
   // Parsing FFT buffer to detect 1750 Hz tone
   using index_t = decltype(_FFTBuf)::index_t;
@@ -201,7 +201,6 @@ void CAudio::SetVolume(int pChannel, float pValue)
   if (!_audio_ok) return;
   if ((pChannel < 0) || (pChannel > 2)) return;
   if ((pValue < 0.0) || (pValue > 1.0)) return;
-  _log->Message("Set volume = " + String(pValue));
   _mixer.setWeight(pChannel, pValue);
 }
 

@@ -308,6 +308,7 @@ void CRepeater::OnUpdate()
 
     // Carriage Detect Management
     _CD = (_RSSI.S >= _squelch);
+
     if (_CD != _lastCD)
     {
       // only work when repeater active
@@ -327,7 +328,7 @@ void CRepeater::OnUpdate()
         // If we loose carriage and we are in repeater mode, play RogerBeep
         if (!_CD && !_audio->IsPlaying())
         {
-          _audio->Play(_beep, _RBVol);
+            _audio->Play(_beep, _RBVol);
         }
       }
       _lastCD = _CD;
