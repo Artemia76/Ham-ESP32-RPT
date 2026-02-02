@@ -583,155 +583,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:FerriteBead"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "FB"
-				(at -3.81 0.635 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "FerriteBead"
-				(at 3.81 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at -1.778 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Ferrite bead"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "L ferrite bead inductor filter"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "Inductor_* L_* *Ferrite*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "FerriteBead_0_1"
-				(polyline
-					(pts
-						(xy -2.7686 0.4064) (xy -1.7018 2.2606) (xy 2.7686 -0.3048) (xy 1.6764 -2.159) (xy -2.7686 0.4064)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 1.27) (xy 0 1.2954)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 -1.27) (xy 0 -1.2192)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "FerriteBead_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 2.54)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 2.54)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Device:Fuse"
 			(pin_numbers
 				(hide yes)
@@ -2538,6 +2389,312 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Ham-ESP32-RPT:VK200"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "L"
+				(at -1.27 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "VK200"
+				(at 2.794 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Inductor with ferrite core"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "inductor choke coil reactor magnetic"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Choke_* *Coil* Inductor_* L_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "VK200_0_1"
+				(arc
+					(start 0 2.54)
+					(mid 0.6323 1.905)
+					(end 0 1.27)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 1.27)
+					(mid 0.6323 0.635)
+					(end 0 0)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 0)
+					(mid 0.6323 -0.635)
+					(end 0 -1.27)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -1.27)
+					(mid 0.6323 -1.905)
+					(end 0 -2.54)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 2.286) (xy 1.016 2.794)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 1.27) (xy 1.016 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 0.254) (xy 1.016 0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 -0.762) (xy 1.016 -0.254)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 -1.778) (xy 1.016 -1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 -2.794) (xy 1.016 -2.286)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.524 2.794) (xy 1.524 2.286)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.524 1.778) (xy 1.524 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.524 0.762) (xy 1.524 0.254)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.524 -0.254) (xy 1.524 -0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.524 -1.27) (xy 1.524 -1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.524 -2.286) (xy 1.524 -2.794)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "VK200_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Sensor_Energy:INA219AxD"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -2962,6 +3119,24 @@
 				)
 			)
 			(property "Description" "600mA Ic, 40V Vce, NPN Transistor, SOT-23"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Sim.Device" "NPN"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Sim.Pins" "1=B 2=E 3=C"
 				(at 0 0 0)
 				(effects
 					(font
@@ -6142,7 +6317,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:FerriteBead")
+		(lib_id "Ham-ESP32-RPT:VK200")
 		(at 236.22 129.54 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -6150,8 +6325,8 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "680ebec4-3dd2-43fc-a52e-0cf51a394953")
-		(property "Reference" "FB4"
-			(at 240.538 130.048 90)
+		(property "Reference" "L4"
+			(at 233.68 129.54 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6159,15 +6334,15 @@
 			)
 		)
 		(property "Value" "VK200"
-			(at 243.078 130.048 90)
+			(at 239.522 129.54 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Inductor_SMD:L_Neosid_MicroCoil_Ms36-L"
-			(at 234.442 129.54 90)
+		(property "Footprint" "Ham-ESP32-RPT-pretty:VK200"
+			(at 236.22 129.54 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6184,7 +6359,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Ferrite bead"
+		(property "Description" "Inductor with ferrite core"
 			(at 236.22 129.54 0)
 			(effects
 				(font
@@ -6202,7 +6377,7 @@
 		(instances
 			(project "Ham-ESP32-RPT"
 				(path "/1aedab51-3492-4fbd-b88f-5a8cb3ade46f"
-					(reference "FB4")
+					(reference "L4")
 					(unit 1)
 				)
 			)
@@ -6275,7 +6450,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:FerriteBead")
+		(lib_id "Ham-ESP32-RPT:VK200")
 		(at 191.77 118.11 270)
 		(unit 1)
 		(exclude_from_sim no)
@@ -6283,8 +6458,8 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "76224912-4fcd-4336-bc61-a027b6c94331")
-		(property "Reference" "FB2"
-			(at 191.262 122.428 90)
+		(property "Reference" "L2"
+			(at 191.77 116.332 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6292,15 +6467,15 @@
 			)
 		)
 		(property "Value" "VK200"
-			(at 191.262 124.968 90)
+			(at 191.77 121.412 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Inductor_SMD:L_Neosid_MicroCoil_Ms36-L"
-			(at 191.77 116.332 90)
+		(property "Footprint" "Ham-ESP32-RPT-pretty:VK200"
+			(at 191.77 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6317,7 +6492,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Ferrite bead"
+		(property "Description" "Inductor with ferrite core"
 			(at 191.77 118.11 0)
 			(effects
 				(font
@@ -6335,7 +6510,7 @@
 		(instances
 			(project "Ham-ESP32-RPT"
 				(path "/1aedab51-3492-4fbd-b88f-5a8cb3ade46f"
-					(reference "FB2")
+					(reference "L2")
 					(unit 1)
 				)
 			)
@@ -6478,7 +6653,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:FerriteBead")
+		(lib_id "Ham-ESP32-RPT:VK200")
 		(at 55.88 162.56 270)
 		(unit 1)
 		(exclude_from_sim no)
@@ -6486,8 +6661,8 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "81ff707c-4a1a-40c0-af63-b38fd954969b")
-		(property "Reference" "FB3"
-			(at 56.388 158.242 90)
+		(property "Reference" "L3"
+			(at 56.134 160.274 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6495,16 +6670,15 @@
 			)
 		)
 		(property "Value" "VK200"
-			(at 56.896 156.21 90)
+			(at 55.88 165.862 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
-		(property "Footprint" "Inductor_SMD:L_Neosid_MicroCoil_Ms36-L"
-			(at 55.88 160.782 90)
+		(property "Footprint" "VK200"
+			(at 55.88 162.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6521,7 +6695,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Ferrite bead"
+		(property "Description" "Inductor with ferrite core"
 			(at 55.88 162.56 0)
 			(effects
 				(font
@@ -6539,7 +6713,7 @@
 		(instances
 			(project "Ham-ESP32-RPT"
 				(path "/1aedab51-3492-4fbd-b88f-5a8cb3ade46f"
-					(reference "FB3")
+					(reference "L3")
 					(unit 1)
 				)
 			)
@@ -6573,7 +6747,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_TO_SOT_SMD:TSOT-23"
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
 			(at 111.125 156.21 0)
 			(effects
 				(font
@@ -6595,6 +6769,24 @@
 			)
 		)
 		(property "Description" "600mA Ic, 40V Vce, NPN Transistor, SOT-23"
+			(at 109.22 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Device" "NPN"
+			(at 109.22 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Pins" "1=B 2=E 3=C"
 			(at 109.22 151.13 0)
 			(effects
 				(font
@@ -7669,17 +7861,16 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:FerriteBead")
+		(lib_id "Ham-ESP32-RPT:VK200")
 		(at 220.98 30.48 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "dbb438df-c0bd-4b8b-8262-841f08f0de33")
-		(property "Reference" "FB1"
-			(at 221.0308 22.86 90)
+		(property "Reference" "L1"
+			(at 220.98 27.94 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7687,15 +7878,15 @@
 			)
 		)
 		(property "Value" "VK200"
-			(at 221.0308 25.4 90)
+			(at 220.98 33.782 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Inductor_SMD:L_Neosid_MicroCoil_Ms36-L"
-			(at 220.98 28.702 90)
+		(property "Footprint" "Ham-ESP32-RPT-pretty:VK200"
+			(at 220.98 30.48 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7712,7 +7903,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Ferrite bead"
+		(property "Description" "Inductor with ferrite core"
 			(at 220.98 30.48 0)
 			(effects
 				(font
@@ -7730,7 +7921,7 @@
 		(instances
 			(project ""
 				(path "/1aedab51-3492-4fbd-b88f-5a8cb3ade46f"
-					(reference "FB1")
+					(reference "L1")
 					(unit 1)
 				)
 			)
