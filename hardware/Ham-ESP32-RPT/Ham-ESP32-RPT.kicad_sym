@@ -980,10 +980,10 @@
 					)
 				)
 			)
-			(pin output line
+			(pin input line
 				(at -25.4 -5.08 0)
 				(length 2.54)
-				(name "A_IN+"
+				(name "A_IN_L"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -999,9 +999,9 @@
 				)
 			)
 			(pin input line
-				(at -25.4 -12.7 0)
+				(at -25.4 -8.89 0)
 				(length 2.54)
-				(name "A_IN-"
+				(name "A_IN_R"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1009,6 +1009,24 @@
 					)
 				)
 				(number "14"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin input line
+				(at -25.4 -12.7 0)
+				(length 2.54)
+				(name "A_IN_GND"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "15"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1165,14 +1183,32 @@
 			(pin output line
 				(at 25.4 -5.08 180)
 				(length 2.54)
-				(name "A_OUT+"
+				(name "A_OUT_L"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number "15"
+				(number "16"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin output line
+				(at 25.4 -8.89 180)
+				(length 2.54)
+				(name "A_OUT_R"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "17"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1183,14 +1219,14 @@
 			(pin output line
 				(at 25.4 -12.7 180)
 				(length 2.54)
-				(name "A_OUT-"
+				(name "A_OUT_GND"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number "16"
+				(number "18"
 					(effects
 						(font
 							(size 1.27 1.27)

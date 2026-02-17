@@ -218,13 +218,7 @@
       "mfg": "",
       "mpn": ""
     },
-    "layer_pairs": [
-      {
-        "bottomLayer": 2,
-        "enabled": true,
-        "topLayer": 0
-      }
-    ],
+    "layer_pairs": [],
     "layer_presets": [],
     "viewports": []
   },
