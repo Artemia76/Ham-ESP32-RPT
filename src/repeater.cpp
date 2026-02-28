@@ -46,7 +46,10 @@ CRepeater::CRepeater() :
     _ina219_ok(false),
     _start_message("louise2.wav"),
     _end_message("end.wav"),
-    _beep("beep.wav")
+    _beep("beep.wav"),
+    _t1s(1000,std::bind(&CRepeater::OnTimer1S,this)),
+    _t500ms(500,std::bind(&CRepeater::OnTimer500ms,this))
+
 {
   _log = CLog::Create();
   _log->Message("Starting Repeater... ");
@@ -75,15 +78,6 @@ CRepeater::CRepeater() :
     _ina219_ok=true;
     _RSSI = _rssi2signal.getByVoltage(_ina219.getBusVoltage());
   }
-  //
-  // Setting Slow Timer
-  //
-  _t1s.setInterval(CRepeater::OnTimer1SCB,1000);
-
-  //
-  // Setting Fast Timer
-  //
-  _t500ms.setInterval(CRepeater::OnTimer500msCB,500);
 
   // Load Config
   _config.begin("repeater",false);
@@ -102,13 +96,6 @@ CRepeater::CRepeater() :
 CRepeater::~CRepeater()
 {
   _config.end();
-}
-
-/*****************************************************************************/
-
-void CRepeater::OnTimer500msCB()
-{
-  CRepeater::Create()->OnTimer500ms();
 }
 
 /*****************************************************************************/
@@ -143,13 +130,6 @@ void CRepeater::OnTimer500ms()
     digitalWrite(RX_LED, LOW);
   }
   _HalfSecondBlink = !_HalfSecondBlink;
-}
-
-/*****************************************************************************/
-
-void CRepeater::OnTimer1SCB()
-{
-  CRepeater::Create()->OnTimer1S();
 }
 
 /*****************************************************************************/
@@ -334,8 +314,8 @@ void CRepeater::OnUpdate()
       _lastCD = _CD;
     }
   }
-  _t1s.handle();
-  _t500ms.handle();
+  _t1s.Update();
+  _t500ms.Update();
 
 }
 

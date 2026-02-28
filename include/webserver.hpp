@@ -26,11 +26,10 @@
 
 #include <ESPAsyncWebServer.h>
 #include <vector>
-//#include <regex>
-#include <AsyncTimer.h>
 #include <WiFi.h>
 
 #include "appevent.hpp"
+#include "timer.hpp"
 #include "webserverevent.hpp"
 #include "log.hpp"
 #include "singleton.hpp"
@@ -97,9 +96,9 @@ private:
      */
     AsyncWebServer _server;
 
-    AsyncTimer _t1s;
+    CTimer _t1s;
 
-    AsyncTimer _t30s;
+    CTimer _t30s;
 
     /**
      * @brief Log Controller
@@ -127,9 +126,7 @@ private:
      */
     void _unSubscribe (CWebServerEvent* pSubscriber);
     void OnTimer1S ();
-    static void OnTimer1SCB ();
     void OnTimer30S ();
-    static void OnTimer30SCB ();
 };
 
 #endif //WEBSERVER_HPP

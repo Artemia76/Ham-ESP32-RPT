@@ -29,6 +29,7 @@ CApp::CApp ()
 {
   _log = CLog::Create(); // Get Log singleton
   _log->Message("Starting Application... OK");
+  _free_heap = esp_get_free_heap_size();
 }
 
 /*****************************************************************************/

@@ -25,11 +25,13 @@
 #define APP_HPP
 
 #include <Arduino.h>
+#include <vector>
+
+#include <esp_system.h>
+
 #include "appevent.hpp"
 #include "webserver.hpp"
 #include "log.hpp"
-
-#include <vector>
 #include "singleton.hpp"
 
 
@@ -93,6 +95,9 @@ private:
      * 
      */
     CLog* _log;
+
+    uint32_t _free_heap;
+    uint32_t _total_heap;
 };
 
 #endif //APP_HPP
