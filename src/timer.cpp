@@ -44,6 +44,7 @@ void CTimer::Start (unsigned long pInterval, bool pOneShoot)
 	if (pInterval > 10) _interval=pInterval;
 	_previousMillis=millis();
 	_oneShoot=pOneShoot;
+	_running=true;
 }
 
 void CTimer::Stop ()
