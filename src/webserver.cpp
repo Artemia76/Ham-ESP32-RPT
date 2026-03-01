@@ -32,7 +32,9 @@ CWebServer::CWebServer () :
     _server (80),
     _ssid (WIFI_SSID),
     _password (WIFI_PASSWORD),
-    _initialized(false)
+    _initialized(false),
+    _t1s(1000,std::bind(&CWebServer::OnTimer1S, this)),
+    _t30s(30000,std::bind(&CWebServer::OnTimer30S, this))
 {
     _log = CLog::Create();
     _log->Message ("Starting WebServer... ");
@@ -141,12 +143,6 @@ CWebServer::CWebServer () :
     });
     //_server.begin();
 
-    //
-    // Setting Slow Timer
-    //
-    _t1s.setInterval(CWebServer::OnTimer1SCB,1000);
-    _t30s.setInterval(CWebServer::OnTimer30SCB,30000);
-
     _initialized = true;
     //_log->Message ("Server Online.");
 }
@@ -218,16 +214,6 @@ void CWebServer::_unSubscribe(CWebServerEvent* pSubscriber)
 
 /*****************************************************************************/
 
-void CWebServer::OnTimer1SCB()
-{
-    CWebServer::Create()->OnTimer1S();
-}
-
-void CWebServer::OnTimer30SCB()
-{
-    CWebServer::Create()->OnTimer30S();
-}
-
 void CWebServer::OnTimer30S()
 {
     if (!WiFi.isConnected())
@@ -248,6 +234,6 @@ void CWebServer::OnTimer1S()
 
 void CWebServer::OnUpdate()
 {
-    _t1s.handle();
-    _t30s.handle();
+    _t1s.Update();
+    _t30s.Update();
 }

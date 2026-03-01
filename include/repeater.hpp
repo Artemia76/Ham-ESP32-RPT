@@ -26,12 +26,12 @@
 
 //#include <Wire.h>
 #include <atomic>
-#include <AsyncTimer.h>
 #include <Preferences.h>
 #include <INA219.h>
 
 #include "log.hpp"
 #include "appevent.hpp"
+#include "timer.hpp"
 #include "singleton.hpp"
 #include "audio.hpp"
 #include "rssi.hpp"
@@ -119,8 +119,8 @@ private:
     CLog* _log;
     CAudio* _audio;
     uint8_t _counter;
-    AsyncTimer _t1s;
-    AsyncTimer _t500ms;
+    CTimer _t1s;
+    CTimer _t500ms;
     INA219 _ina219;
     int _lastState;
     int _currentState;
@@ -143,8 +143,6 @@ private:
     String _end_message;
     String _beep;
 
-    static void OnTimer1SCB ();
-    static void OnTimer500msCB ();
     void OnTimer1S ();
     void OnTimer500ms ();
 };
