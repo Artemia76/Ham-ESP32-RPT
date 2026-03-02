@@ -23,49 +23,71 @@
 
 #include "timer.hpp"
 
-CTimer::CTimer (unsigned long pInterval, TimerCallback pCallBack, bool pOneShoot) :
+/*****************************************************************************/
+
+CTimer::CTimer (unsigned long pInterval, TimerCallback pCallBack, bool pOneShot) :
     _previousMillis(0),
     _running(false)
 {
+	// Ensure the Interval is at least greater than 10 Milliseconds
 	if (pInterval <10) pInterval=10;
 	_interval=pInterval;
-    _oneShoot = pOneShoot;
-    _Callback = pCallBack;
-    Start(pInterval);
+  _oneShot = pOneShot;
+  _Callback = pCallBack;
+	// Start the timer by default
+  Start(pInterval);
 }
+
+/*****************************************************************************/
 
 void CTimer::Start ()
 {
-    Start(_interval);
+	Start(_interval);
 }
 
-void CTimer::Start (unsigned long pInterval, bool pOneShoot)
+/*****************************************************************************/
+
+void CTimer::Start (unsigned long pInterval, bool pOneShot)
 {
+	// Ensure the interval is at least greater than 10 Milliseconds
 	if (pInterval > 10) _interval=pInterval;
+	// Store the start value of millis
 	_previousMillis=millis();
-	_oneShoot=pOneShoot;
+	_oneShot=pOneShot;
 	_running=true;
 }
 
+/*****************************************************************************/
+
 void CTimer::Stop ()
 {
+	// Return the running state
 	if(_running) _running=false;
 }
 
+/*****************************************************************************/
+
 void CTimer::Update ()
 {
+	// If running we check if timer reach Interval
 	if(_running)
 	{
+		// Statement to check if we reached the interval
 		if (millis() - _previousMillis >= _interval)
 		{
-			if (!_oneShoot) _previousMillis=millis();
-			else _running=false;
+			// If not oneShot
+			if (_oneShot) _running=false;
+			else _previousMillis=millis();
+			// Calling the callback function
 			_Callback();
 		}
 	}
 }
 
+/*****************************************************************************/
+
 bool CTimer::IsRunning()
 {
+	// Return timer state
 	return (_running);
 }

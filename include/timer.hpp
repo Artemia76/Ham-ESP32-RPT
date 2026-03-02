@@ -27,51 +27,83 @@
 #include <Arduino.h>
 #include <functional>
 
-class CTimer;
-
-/*! \class CTimer
- *  \brief Timer representation
- *
- *  Timer Class for arduino board
+/**
+ * @brief Handle Timer with callback
+ * @details This class purpose simple timer with preselection to callback user
+ *          class Method with possibility to one shot or repeat mode 
+ * 
  */
-
 class CTimer
 {
 private:
-    typedef std::function<void()> TimerCallback;
-	TimerCallback _Callback;
-	unsigned long  _interval;
-	bool _oneShoot;
-    bool _running;
-	unsigned long _previousMillis;
+  /**
+   * @brief Callback type method
+   * 
+   */
+  typedef std::function<void()> TimerCallback;
+
+  /**
+   * @brief Memory to Callback User class method
+   * 
+   */
+  TimerCallback _Callback;
+  uint32_t _interval;
+  bool _oneShot;
+  bool _running;
+	uint32_t _previousMillis;
 
 public:
 
-    /* \brief CTimer constructor
-        *
-        *  int Duration : Timer duration in msec
-        * TimerCallback CallBack : address of callback timer function in format:
-        * 	void myEventTimerFunction (CTimer* Timer)
-        */
-    CTimer (unsigned long pInterval, TimerCallback pCallBack,bool pOneShoot=false);
+  /**
+   * @brief CTimer constructor
+   *
+   * @param pInterval : Timer duration in msec
+   * @param pCallBack : CallBack method address :
+   *            Usage exemple : std::bind(&Class::CallbackMethod,this)
+   * @param pOneShot : (Optional) If true , trig once a time the timer
+   *                  If False, by default restart timer after each callback
+   */
+  CTimer (unsigned long pInterval, TimerCallback pCallBack,bool pOneShot=false);
 
-    /* \brief CTimer destructor
-        */
-    ~CTimer(){}
+  /**
+   * @brief Destroy the CTimer object
+   * 
+   */
+  ~CTimer(){}
 
-    /* \brief CTimer Updater
-        *
-        * This method update the timer and call the callback function if time duration elapsed
-        * if OneShoot is false, it start again the timer for the same duration
-        * need to be placed in loop
-        */
-    void	Update();
+  /**
+   * @brief Update the timer and trig the callback if Interval reached
+   * 
+   */
+  void Update();
 
-    void    Start();
-    void	Start(unsigned long pInterval,bool pOneShoot=false );
-    void	Stop();
-    bool	IsRunning();
+  /**
+   * @brief Start the timer for the last duration Interval
+   * 
+   */
+  void Start();
+
+  /**
+   * @brief Start the timer for the interval in parameters and recall mode
+   * 
+   * @param pInterval : Interval duration ine millisecond
+   * @param pOneShot : Call one shot the callback if true
+   */
+  void Start(unsigned long pInterval,bool pOneShot=false );
+
+  /**
+   * @brief Stop the timer
+   * 
+   */
+  void Stop();
+
+  /**
+   * @brief Return Timer State
+   * 
+   * @return true : The timer running
+   * @return false : The timer stopped
+   */
+  bool IsRunning();
 };
-
 
 #endif //TIMER_HPP
