@@ -13,7 +13,8 @@ var RBValue = document.getElementById('RBValue');
 var RBVolume = document.getElementById('RBVolume');
 var EndValue = document.getElementById('EndValue');
 var EndVolume = document.getElementById('EndVolume');
-
+var TestBtn = document.getElementById('TestBtn');
+var RstBtn = document.getElementById('RstBtn');
 window.onload = (event) => {
 	  SqlControl.addEventListener('input', function()
     {
@@ -51,7 +52,7 @@ window.onload = (event) => {
   xhttp.onreadystatechange = function()
   {
     if(this.readyState == 4 && this.status == 200)
-		{
+    {
       const json = JSON.parse(this.responseText);
       RepControl.checked = json.state;
       SqlControl.value = json.squelch;
@@ -67,7 +68,7 @@ window.onload = (event) => {
       EndVolume.value = json.EndVol;
       EndValue.innerHTML = json.EndVol;
 
-      RepControl.addEventListener('mo', function()
+      RepControl.addEventListener('change', function()
         {
           var xhttp = new XMLHttpRequest();
           xhttp.open("POST", "set", true);
@@ -77,42 +78,42 @@ window.onload = (event) => {
       );
 			SqlControl.addEventListener('change', function()
 				{
-					var xhttp = new XMLHttpRequest();
-					xhttp.open("POST", "set", true);
-					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-					xhttp.send("Sql=" + String(this.value));
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("POST", "set", true);
+          xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhttp.send("Sql=" + String(this.value));
 				}
 			);
       MagControl.addEventListener('change', function()
         {
-					var xhttp = new XMLHttpRequest();
-					xhttp.open("POST", "set", true);
-					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-					xhttp.send("Mag=" + String(this.value));
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("POST", "set", true);
+          xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhttp.send("Mag=" + String(this.value));
 				}
       );
       TOTControl.addEventListener('change', function()
         {
-					var xhttp = new XMLHttpRequest();
-					xhttp.open("POST", "set", true);
-					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-					xhttp.send("TOT=" + String(this.value));
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("POST", "set", true);
+          xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhttp.send("TOT=" + String(this.value));
 				}
       );
       StartVolume.addEventListener('change', function()
         {
-					var xhttp = new XMLHttpRequest();
-					xhttp.open("POST", "set", true);
-					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-					xhttp.send("StartVol=" + String(this.value));
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("POST", "set", true);
+          xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhttp.send("StartVol=" + String(this.value));
 				}
       );
       RBVolume.addEventListener('change', function()
         {
-					var xhttp = new XMLHttpRequest();
-					xhttp.open("POST", "set", true);
-					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-					xhttp.send("RBVol=" + String(this.value));
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("POST", "set", true);
+          xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhttp.send("RBVol=" + String(this.value));
 				}
       );
       EndVolume.addEventListener('change', function()
@@ -122,6 +123,22 @@ window.onload = (event) => {
 					xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 					xhttp.send("EndVol=" + String(this.value));
 				}
+      );
+      TestBtn.addEventListener('click', function()
+        {
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("POST", "set", true);
+          xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhttp.send("Test=true");
+        }
+      );
+      RstBtn.addEventListener('click', function()
+        {
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("POST", "set", true);
+          xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhttp.send("Restart=true");
+        }
       );
       setInterval(function getData()
         {

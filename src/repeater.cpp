@@ -395,4 +395,12 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
     _config.putFloat("EndVol", _EndVol);
     _log->Message("End Announce volume change to " + String((int)(_EndVol * 100)) + " %", CLog::DEBUG);
   }
+  else if (pCommand == "Test")
+  {
+    Actions(START_TX);
+  }
+  else if (pCommand == "Restart")
+  {
+    ESP.restart();
+  }
 }
