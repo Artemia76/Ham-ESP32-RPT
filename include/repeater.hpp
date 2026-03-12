@@ -24,8 +24,6 @@
 #ifndef LOGIC_HPP
 #define LOGIC_HPP
 
-//#include <Wire.h>
-#include <atomic>
 #include <Preferences.h>
 #include <INA219.h>
 
@@ -113,9 +111,6 @@ private:
      */
     Steps _lastStep;
 
-
-    std::atomic<bool> _switch;
-
     CLog* _log;
     CAudio* _audio;
     uint8_t _counter;
@@ -132,7 +127,6 @@ private:
     float _EndVol;
     bool _lastCD;
     bool _CD;
-    bool _enabled;
     bool _playingRogerBeep;
     int _squelch;
     bool _HalfSecondBlink;
@@ -142,6 +136,7 @@ private:
     String _start_message;
     String _end_message;
     String _beep;
+    bool _enabled;
 
     void OnTimer1S ();
     void OnTimer500ms ();

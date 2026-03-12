@@ -26,12 +26,12 @@
 #include "repeater.hpp"
 
 CRepeater::CRepeater() :
+    _enabled(true),
     _step(IDLE),
     _lastStep(IDLE),
     _counter(0),
     _lastState(HIGH),
     _currentState(HIGH),
-    _switch(true),
     _CD(false),
     _playingRogerBeep(false),
     _TOT(180),
@@ -40,7 +40,6 @@ CRepeater::CRepeater() :
     _RBVol(1.0),
     _EndVol(1.0),
     _HalfSecondBlink(false),
-    _enabled(true),
     _squelch(6),
     _ina219(0x40),
     _ina219_ok(false),
@@ -208,7 +207,7 @@ void CRepeater::OnTimer1S()
 void CRepeater::Actions(const Steps& pStep)
 {
   _counter = 0;
-  if (!_switch) return;
+  if (!_enabled) return;
   switch (pStep)
   {
     case IDLE:
@@ -314,6 +313,13 @@ void CRepeater::OnUpdate()
       _lastCD = _CD;
     }
   }
+  else
+  {
+    if (_step != IDLE)
+    {
+      _step = IDLE;
+    }
+  }
   _t1s.Update();
   _t500ms.Update();
 
@@ -355,8 +361,8 @@ void CRepeater::onSet(const String& pCommand, const String& pData)
     }
     else if (pData == "false")
     {
-      _enabled=false;
       Actions(IDLE);
+      _enabled=false;
     }
     _config.putBool("Enabled",_enabled);
   }
