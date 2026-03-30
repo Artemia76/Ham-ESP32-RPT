@@ -35,6 +35,7 @@
 #include "app.hpp"
 #include "singleton.hpp"
 #include "AudioConfigLocal.hpp"
+#include <mutex>
 
 
 // A/D Converter PINs
@@ -146,6 +147,7 @@ private:
     float _mag_threshold;
     float _1750_hyst;
     bool _is_playing;
+    std::recursive_mutex _mutex;
     std::map <String, File> _catalog;
     static void fftResultCB (AudioFFTBase &fft);
     void fftResult(AudioFFTBase &fft);

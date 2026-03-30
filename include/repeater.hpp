@@ -26,6 +26,7 @@
 
 #include <Preferences.h>
 #include <INA219.h>
+#include <mutex>
 
 #include "log.hpp"
 #include "appevent.hpp"
@@ -137,6 +138,7 @@ private:
     String _end_message;
     String _beep;
     bool _enabled;
+    std::recursive_mutex _mutex;
 
     void OnTimer1S ();
     void OnTimer500ms ();

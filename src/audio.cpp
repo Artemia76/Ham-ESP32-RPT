@@ -137,6 +137,7 @@
 
 bool CAudio::Is1750Detected ()
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   if (!_audio_ok) return false;
 
   // If there is not enough data in buffer, return false
@@ -170,6 +171,7 @@ void CAudio::fftResultCB(AudioFFTBase &fft)
 
 void CAudio::fftResult(AudioFFTBase &fft)
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   AudioFFTResult TopScore;
   TopScore.magnitude= 0.0;
   TopScore.frequency= 0.0;
@@ -198,6 +200,7 @@ bool CAudio::IsCTCSSEnabled()
 
 void CAudio::SetVolume(int pChannel, float pValue)
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   if (!_audio_ok) return;
   if ((pChannel < 0) || (pChannel > 2)) return;
   if ((pValue < 0.0) || (pValue > 1.0)) return;
@@ -208,7 +211,8 @@ void CAudio::SetVolume(int pChannel, float pValue)
 
 void CAudio::Play(const String& pSound, float pVolume)
 {
-  if ((!_audio_ok) || (_is_playing));
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
+  if ((!_audio_ok) || (_is_playing)) return;
   _is_playing = true;
   SetVolume(1,pVolume);
   _player.setVolume(pVolume);
@@ -229,6 +233,7 @@ bool CAudio::IsPlaying()
 
 void CAudio::OnUpdate()
 {
+    std::lock_guard<std::recursive_mutex> lock(_mutex);
     if (!_audio_ok) return;
     if (_is_playing && !IsPlaying())
     {
@@ -251,6 +256,7 @@ void CAudio::OnUpdate()
 
 float CAudio::Get1750Threshold()
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   return _mag_threshold;
 }
 
@@ -258,6 +264,7 @@ float CAudio::Get1750Threshold()
 
 void CAudio::Set1750Threshold(const float& pThreshold)
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   _mag_threshold = pThreshold;
   if (_mag_threshold<0.0) _mag_threshold = 0.0;
   if (_mag_threshold>100.0) _mag_threshold = 100.0;

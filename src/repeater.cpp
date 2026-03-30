@@ -206,6 +206,7 @@ void CRepeater::OnTimer1S()
 
 void CRepeater::Actions(const Steps& pStep)
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   _counter = 0;
   if (!_enabled) return;
   switch (pStep)
@@ -271,6 +272,7 @@ void CRepeater::Actions(const Steps& pStep)
 
 void CRepeater::OnUpdate()
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   if (_enabled)
   {
     // Manual trig Repeater through button
@@ -329,6 +331,7 @@ void CRepeater::OnUpdate()
 
 String CRepeater::onGet(const String& pCommand, const String& pData)
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   String Result = "";
   if (pCommand == "RSSI")
   {
@@ -353,6 +356,7 @@ String CRepeater::onGet(const String& pCommand, const String& pData)
 
 void CRepeater::onSet(const String& pCommand, const String& pData)
 {
+  std::lock_guard<std::recursive_mutex> lock(_mutex);
   if (pCommand == "Rep")
   {
     if (pData == "true")
