@@ -9,28 +9,29 @@
 		<script src="script.js" defer></script>
 	</head>
 	<body>
-		<div class="w3-container w3-orange">
-			<h1>F5ZEV - SHTSF</h1>
-			<p>ADMIN SETTINGS</p>
+		<div class="header-container">
+			<div class="header-title">
+				<h1>F5ZEV-SHTSF</h1>
+				<p>ADMIN SETTINGS</p>
+			</div>
+			<div class="header-buttons">
+				<button class="green-button" id="TestBtn" type="button">Test</button>
+				<button class="red-button" id="RstBtn" type="button">Restart</button>
+			</div>
 		</div>
+		<div class="main-content">
 		<div class="w3-container w3-card-4 w3-grey">
 			<div class="w3-row-padding">
-				<div class="w3-quarter">
+				<div class="w3-half">
 					<h2>Service Mode</h2>
 				</div>
-				<div class="w3-quarter">
+				<div class="w3-half">
 					<h2>
 						<label class="switch">
 							<input id="RepControl" type="checkbox">
 							<span class="slider round"></span>
 						</label>
 					</h2>
-				</div>
-				<div class="w3-quarter">
-					<button class="green-button" id="TestBtn" type="button">Test</button>
-				</div>
-				<div class="w3-quarter">
-					<button class="red-button" id="RstBtn" type="button">Restart</button>
 				</div>
 			</div>
 		</div>
@@ -120,6 +121,7 @@
 						<span id="EndValue"></span></p>
 				</div>
 			</div>
+		</div>
 		</div>
 	</body>
 </html>

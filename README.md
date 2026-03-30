@@ -175,7 +175,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 - [x] Audio 1750 Hz FFT Detection
 - [x] Repeater Sequence
-- [ ] Web Management
+- [X] Web Management
 - [X] Permanent Memory
 - [ ] PCB Design
 
