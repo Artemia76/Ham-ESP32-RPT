@@ -28,6 +28,7 @@
 
 #include "webserver.hpp"
 #include "env.hpp"
+#include "usermanager.hpp"
 
 CWebServer::CWebServer () :
     _server (80),
@@ -76,10 +77,149 @@ CWebServer::CWebServer () :
     _log->Message ("Wifi Channel: " + String(WiFi.channel()));
 
     //--------------------------------------------SERVER
-    _server.on("/",HTTP_GET, [](AsyncWebServerRequest *request)
+    _server.on("/login.html", HTTP_GET, [](AsyncWebServerRequest *request)
     {
+        request->send(LittleFS, "/web/login.html", "text/html");
+    });
+
+    _server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+    {
+        String token = "";
+        if (request->hasHeader("Cookie")) {
+            String cookie = request->header("Cookie");
+            int start = cookie.indexOf("session=");
+            if (start != -1) {
+                token = cookie.substring(start + 8);
+                int end = token.indexOf(';');
+                if (end != -1) token = token.substring(0, end);
+            }
+        }
+
+        UserRole role;
+        if (!CUserManager::Create()->validateSession(token, role)) {
+            request->redirect("/login.html");
+            return;
+        }
         request->send(LittleFS, "/web/index.html", "text/html");
     });
+
+    _server.on("/auth/login", HTTP_POST, [](AsyncWebServerRequest *request) {
+        String username = "";
+        String password = "";
+        if (request->hasParam("username", true)) username = request->getParam("username", true)->value();
+        if (request->hasParam("password", true)) password = request->getParam("password", true)->value();
+
+        String token;
+        if (CUserManager::Create()->authenticate(username, password, token)) {
+            AsyncWebServerResponse *response = request->beginResponse(200, "application/json", "{\"status\":\"ok\"}");
+            response->addHeader("Set-Cookie", "session=" + token + "; Path=/; HttpOnly");
+            request->send(response);
+        } else {
+            request->send(401, "application/json", "{\"status\":\"error\",\"message\":\"Unauthorized\"}");
+        }
+    });
+
+    _server.on("/auth/logout", HTTP_POST, [](AsyncWebServerRequest *request) {
+        if (request->hasHeader("Cookie")) {
+            String cookie = request->header("Cookie");
+            int start = cookie.indexOf("session=");
+            if (start != -1) {
+                String token = cookie.substring(start + 8);
+                int end = token.indexOf(';');
+                if (end != -1) token = token.substring(0, end);
+                CUserManager::Create()->logout(token);
+            }
+        }
+        AsyncWebServerResponse *response = request->beginResponse(200, "application/json", "{\"status\":\"ok\"}");
+        response->addHeader("Set-Cookie", "session=; Path=/; Max-Age=0");
+        request->send(response);
+    });
+
+    _server.on("/auth/status", HTTP_GET, [](AsyncWebServerRequest *request) {
+        String token = "";
+        if (request->hasHeader("Cookie")) {
+            String cookie = request->header("Cookie");
+            int start = cookie.indexOf("session=");
+            if (start != -1) {
+                token = cookie.substring(start + 8);
+                int end = token.indexOf(';');
+                if (end != -1) token = token.substring(0, end);
+            }
+        }
+        UserRole role;
+        if (CUserManager::Create()->validateSession(token, role)) {
+            request->send(200, "application/json", "{\"authenticated\":true,\"role\":\"" + CUserManager::Create()->roleToString(role) + "\"}");
+        } else {
+            request->send(200, "application/json", "{\"authenticated\":false}");
+        }
+    });
+
+    _server.on("/admin/users", HTTP_GET, [](AsyncWebServerRequest *request) {
+        UserRole role;
+        if (!CUserManager::Create()->validateSession(CWebServer::GetToken(request), role) || role != UserRole::ADMINISTRATOR) {
+            request->send(403, "application/json", "{\"error\":\"Forbidden\"}");
+            return;
+        }
+        request->send(200, "application/json", CUserManager::Create()->getUsersJson());
+    });
+
+    _server.on("/admin/users/add", HTTP_POST, [](AsyncWebServerRequest *request) {
+        UserRole role;
+        if (!CUserManager::Create()->validateSession(CWebServer::GetToken(request), role) || role != UserRole::ADMINISTRATOR) {
+            request->send(403, "application/json", "{\"error\":\"Forbidden\"}");
+            return;
+        }
+        String username = request->getParam("username", true)->value();
+        String password = request->getParam("password", true)->value();
+        String roleStr = request->getParam("role", true)->value();
+        UserRole targetRole = CUserManager::Create()->stringToRole(roleStr);
+        
+        if (CUserManager::Create()->addUser(username, password, targetRole)) {
+            request->send(200, "application/json", "{\"status\":\"ok\"}");
+        } else {
+            request->send(400, "application/json", "{\"status\":\"error\"}");
+        }
+    });
+
+    _server.on("/admin/users/delete", HTTP_POST, [](AsyncWebServerRequest *request) {
+        UserRole role;
+        if (!CUserManager::Create()->validateSession(CWebServer::GetToken(request), role) || role != UserRole::ADMINISTRATOR) {
+            request->send(403, "application/json", "{\"error\":\"Forbidden\"}");
+            return;
+        }
+        String username = request->getParam("username", true)->value();
+        if (CUserManager::Create()->removeUser(username)) {
+            request->send(200, "application/json", "{\"status\":\"ok\"}");
+        } else {
+            request->send(400, "application/json", "{\"status\":\"error\"}");
+        }
+    });
+
+    _server.on("/admin/config/export", HTTP_GET, [](AsyncWebServerRequest *request) {
+        UserRole role;
+        if (!CUserManager::Create()->validateSession(CWebServer::GetToken(request), role) || role != UserRole::ADMINISTRATOR) {
+            request->send(403, "application/json", "{\"error\":\"Forbidden\"}");
+            return;
+        }
+        request->send(200, "application/json", CUserManager::Create()->exportConfig());
+    });
+
+    _server.on("/admin/config/import", HTTP_POST, [](AsyncWebServerRequest *request) {
+        UserRole role;
+        if (!CUserManager::Create()->validateSession(CWebServer::GetToken(request), role) || role != UserRole::ADMINISTRATOR) {
+            request->send(403, "application/json", "{\"error\":\"Forbidden\"}");
+            return;
+        }
+        if (request->hasParam("config", true)) {
+            String config = request->getParam("config", true)->value();
+            if (CUserManager::Create()->importConfig(config)) {
+                request->send(200, "application/json", "{\"status\":\"ok\"}");
+            } else {
+                request->send(400, "application/json", "{\"status\":\"error\"}");
+            }
+        }
+    });
+
 
     _server.on("/w3.css",HTTP_GET, [](AsyncWebServerRequest *request)
     {
@@ -98,6 +238,11 @@ CWebServer::CWebServer () :
 
     _server.on("/get",HTTP_POST, [this](AsyncWebServerRequest *request)
     {
+        UserRole role;
+        if (!CUserManager::Create()->validateSession(CWebServer::GetToken(request), role)) {
+            request->send(401);
+            return;
+        }
         if (request->params() < 1) return;
         String Key = request->getParam(0)->name();
         String Param = request->getParam(0)->value();
@@ -119,6 +264,11 @@ CWebServer::CWebServer () :
 
     _server.on("/set",HTTP_POST, [this](AsyncWebServerRequest *request)
     {
+        UserRole role;
+        if (!CUserManager::Create()->validateSession(CWebServer::GetToken(request), role) || role < UserRole::MODERATOR) {
+            request->send(403);
+            return;
+        }
         if (request->params() < 1) return;
         String Key = request->getParam(0)->name();
         String Param = request->getParam(0)->value();
@@ -186,4 +336,19 @@ void CWebServer::OnTimer1S()
 void CWebServer::OnUpdate()
 {
     _t1s.handle();
+}
+
+String CWebServer::GetToken(AsyncWebServerRequest *request)
+{
+    if (request->hasHeader("Cookie")) {
+        String cookie = request->header("Cookie");
+        int start = cookie.indexOf("session=");
+        if (start != -1) {
+            String token = cookie.substring(start + 8);
+            int end = token.indexOf(';');
+            if (end != -1) token = token.substring(0, end);
+            return token;
+        }
+    }
+    return "";
 }

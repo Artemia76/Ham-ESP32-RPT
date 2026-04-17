@@ -116,6 +116,7 @@ private:
     void _unSubscribe (CWebServerEvent* pSubscriber);
     void OnTimer1S ();
     static void OnTimer1SCB ();
+    static String GetToken(AsyncWebServerRequest *request);
 };
 
 #endif //WEBSERVER_HPP

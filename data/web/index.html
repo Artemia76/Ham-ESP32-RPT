@@ -1,51 +1,112 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="fr">
+<head>
     <title>Administration du relais F5ZEV</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="w3.css">
     <link rel="stylesheet" type="text/css" href="custom.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-dark: #1e293b;
+            --card-bg: #334155;
+        }
+        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; margin: 0; }
+        .header { background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .nav-tabs { display: flex; gap: 1rem; padding: 1rem 2rem; background: #1e293b; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-tab { cursor: pointer; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: background 0.2s; color: #94a3b8; }
+        .nav-tab.active { background: var(--primary); color: white; }
+        .container { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card-bg); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.1); }
+        .hidden { display: none; }
+        .user-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .user-table th, .user-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .btn-logout { background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+        .btn-danger { background: #dc2626; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+        input, select { background: #0f172a; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem; border-radius: 0.25rem; }
+    </style>
     <script type="text/javascript" src="script.js" defer></script>
-  </head>
-  <body>
-    <div class="w3-container w3-orange">
-      <h1>F5ZEV - SHTSF</h1>
-      <p>ADMIN SETTINGS</p>
+</head>
+<body>
+    <header class="header">
+        <div>
+            <h1 style="margin:0; font-size: 1.5rem;">F5ZEV - SHTSF</h1>
+            <span id="userRole" style="font-size: 0.8rem; color: #94a3b8;">Chargement...</span>
+        </div>
+        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </header>
+
+    <div class="nav-tabs">
+        <div id="tabDashboard" class="nav-tab active" onclick="showTab('dashboard')">Tableau de bord</div>
+        <div id="tabAdmin" class="nav-tab hidden" onclick="showTab('admin')">Gestion Utilisateurs</div>
     </div>
-    <div class="w3-container w3-card-4 w3-grey">
-      <div class="w3-row-padding">
-        <div class="w3-third">
-          <h2>POWER SUPPLY</h2>
+
+    <div id="dashboardSection" class="container">
+        <div class="card">
+            <div class="w3-row-padding">
+                <div class="w3-third"><h2>ALIMENTATION</h2></div>
+                <div class="w3-twothird">
+                    <h2><label class="switch">
+                        <input id="RepControl" type="checkbox">
+                        <span class="slider round"></span>
+                    </label></h2>
+                </div>
+            </div>
         </div>
-        <div class="w3-twothird">
-          <h2><label class="switch">
-              <input id="RepControl" type="checkbox">
-              <span class="slider round"></span>
-            </label></h2>
+
+        <div class="card">
+            <div class="w3-row-padding">
+                <div class="w3-third"><h2>NIVEAU RSSI</h2></div>
+                <div class="w3-twothird"><h2 id="RSSI">0 dBm</h2></div>
+            </div>
         </div>
-      </div>
+
+        <div class="card">
+            <div class="w3-row-padding">
+                <div class="w3-third"><h2>SQUELCH</h2></div>
+                <div class="w3-twothird">
+                    <input type="range" min="1" max="13" value="9" class="slider2" id="SqlControl" style="width: 100%;">
+                    <p>Valeur: <span id="sql_value">9</span></p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="w3-container w3-card-4 w3-grey">
-      <div class="w3-row-padding">
-        <div class="w3-third">
-          <h2>RSSI LEVEL</h2>
+
+    <div id="adminSection" class="container hidden">
+        <div class="card">
+            <h3>Ajouter un utilisateur</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <input type="text" id="newUsername" placeholder="Nom d'utilisateur">
+                <input type="password" id="newPassword" placeholder="Mot de passe">
+                <select id="newRole">
+                    <option value="Utilisateur">Utilisateur</option>
+                    <option value="Modérateur">Modérateur</option>
+                    <option value="Administrateur">Administrateur</option>
+                </select>
+                <button class="btn-action" onclick="addUser()">Ajouter</button>
+            </div>
         </div>
-        <div class="w3-twothird">
-          <h2 id="RSSI">0 dBm</h2>
+
+        <div class="card">
+            <h3>Utilisateurs existants</h3>
+            <table class="user-table">
+                <thead>
+                    <tr><th>Nom</th><th>Rôle</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="userListBody"></tbody>
+            </table>
         </div>
-      </div>
+
+        <div class="card">
+            <h3>Configuration (Export/Import)</h3>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn-action" onclick="exportConfig()">Exporter la config</button>
+                <button class="btn-action" onclick="document.getElementById('importFile').click()">Importer la config</button>
+                <input type="file" id="importFile" class="hidden" onchange="importConfig(this)">
+            </div>
+        </div>
     </div>
-    <div class="w3-container w3-card-4 w3-grey">
-      <div class="w3-row-padding">
-        <div class="w3-third">
-          <h2>SQUELCH LEVEL</h2>
-        </div>
-        <div class="w3-twothird">
-          <input type="range" min="1" max="13" value="9" class="slider2" id="SqlControl">
-          <p>Value:
-            <span id="sql_value"></span></p>
-        </div>
-      </div>
-    </div>
-  </body>
+
+</body>
 </html>
