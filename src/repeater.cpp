@@ -299,17 +299,16 @@ void CRepeater::OnUpdate()
         if (!_CD)
         {
           _audio->SetVolume(0,0.0);
+          // If last repeating during more than 3 Sec, play RogerBeep
+          if ((!_audio->IsPlaying())&&(_TOT_Counter >=3))
+          {
+              _audio->Play(_beep, _RBVol);
+          }
           _TOT_Counter = 0;
         }
         else
         {
           _audio->SetVolume(0,1.0);
-        }
-
-        // If we loose carriage and we are in repeater mode, play RogerBeep
-        if (!_CD && !_audio->IsPlaying())
-        {
-            _audio->Play(_beep, _RBVol);
         }
       }
       _lastCD = _CD;
