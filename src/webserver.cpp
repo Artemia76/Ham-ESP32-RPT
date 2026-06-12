@@ -59,11 +59,11 @@ CWebServer::CWebServer () :
     WiFi.disconnect(true);
     delay (1000);
 
-    WiFi.onEvent(CB_WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
-    WiFi.onEvent(CB_WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
-    WiFi.onEvent(CB_WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
+    //WiFi.onEvent(CB_WiFiStationConnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_CONNECTED);
+    //WiFi.onEvent(CB_WiFiGotIP, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_GOT_IP);
+    //WiFi.onEvent(CB_WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
-    WiFi.begin(_ssid, _password);
+    //WiFi.begin(_ssid, _password);
     _log->Message ("Connecting to " + String(_ssid) + " ...");
 
     /*while (WiFi.status() != WL_CONNECTED)
